@@ -9,6 +9,7 @@ import {
 
 import { AccountsTab } from "@/components/Accounts";
 import { AddAccountModal } from "@/components/AddAccountModal";
+import { EditRepublicModal } from "@/components/EditRepublicModal";
 import { ResidentsTab } from "@/components/ResidentsPage";
 import { ResumeTab } from "@/components/Resume";
 import Tabs from "@/components/Tabs";
@@ -39,6 +40,7 @@ export default function Dashboard() {
     isLoading,
   } = useAsyncStorage<Republica>(initialRepublica);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   // Carregar imagem da república
   useEffect(() => {
@@ -48,6 +50,12 @@ export default function Dashboard() {
     };
     loadImage();
   }, []);
+
+  // Função para salvar edições da república
+  const handleSaveRepublica = (nome: string, imagem?: string) => {
+    setRepublica({ ...republica, nome, imagemRepublica: imagem });
+    setRepublicImage(imagem);
+  };
 
   // Mostrar loading enquanto carrega dados
   if (isLoading) {
@@ -82,14 +90,17 @@ export default function Dashboard() {
           )}
         </View>
 
-        <View className="flex-1 justify-center">
+        <TouchableOpacity
+          onPress={() => setShowEditModal(true)}
+          className="flex-1 justify-center"
+        >
           <Text className="text-base font-semibold">
             {republica.nome || "República"}
           </Text>
           <Text className="text-sm text-gray-500">
             {republica.moradores.length} moradores
           </Text>
-        </View>
+        </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => setShowAddModal(true)}
@@ -115,12 +126,20 @@ export default function Dashboard() {
         )}
       </View>
 
-      {/* Modal */}
+      {/* Modais */}
       <AddAccountModal
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
         republica={republica}
         setRepublica={setRepublica}
+      />
+
+      <EditRepublicModal
+        visible={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        currentName={republica.nome}
+        currentImage={republicImage}
+        onSave={handleSaveRepublica}
       />
     </View>
   );
