@@ -1,0 +1,27 @@
+export type Morador = {
+  id: string;
+  nome: string;
+  chavePix?: string;
+};
+
+export type Responsavel = {
+  moradorId: string;
+  valor: number;
+};
+
+export type Conta = {
+  id: string;
+  descricao: string;
+  valor: number;
+  vencimento: string; // ISO date
+  pago: boolean;
+  pagoEm?: string; // ISO date
+  responsavelId: string; // morador responsável principal
+  responsaveis: Responsavel[]; // divisão
+  metodoPagamento?: string;
+};
+
+export type Republica = {
+  moradores: Morador[];
+  contas: Conta[];
+};
