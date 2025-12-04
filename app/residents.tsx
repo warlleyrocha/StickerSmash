@@ -99,7 +99,7 @@ export default function Residents() {
             className="mt-2 items-center justify-center rounded-lg bg-blue-500 px-4 py-3"
             onPress={handleAddResident}
           >
-            <Text className="text-lg font-semibold text-white">
+            <Text className="font-inter-medium text-lg text-white">
               + Adicionar Morador
             </Text>
           </TouchableOpacity>

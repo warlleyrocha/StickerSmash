@@ -87,11 +87,13 @@ export default function Register() {
         >
           <View className="items-center justify-center gap-[24px] py-12">
             <View className="h-[81px] w-[81px] items-center justify-center rounded-full bg-[#111928]">
-              <Text className="font-inter-bold text-[36px] text-white">iF</Text>
+              <Text className="font-inter-semibold text-[36px] text-white">
+                iF
+              </Text>
             </View>
 
             <Text
-              className="font-inter-bold text-center text-white"
+              className="font-inter-semibold text-center leading-[22px] text-white"
               style={{
                 fontSize: width > 400 ? 25 : 24,
                 lineHeight: width > 400 ? 28 : 24,
@@ -127,7 +129,7 @@ export default function Register() {
                   <Feather name="image" size={48} color="#6b7280" />
                 )}
               </View>
-              <Text className="mt-3 text-sm text-indigo-600">
+              <Text className="font-mulish mt-3 text-sm text-indigo-600">
                 {republicImage
                   ? "Toque para alterar a imagem"
                   : "Adicionar imagem"}
@@ -152,7 +154,9 @@ export default function Register() {
             className="mb-8 w-full rounded-lg bg-blue-500 px-4 py-3"
             onPress={handlePress}
           >
-            <Text className="text-center text-lg text-white">Registrar</Text>
+            <Text className="font-inter-medium text-center text-lg text-white">
+              Registrar
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

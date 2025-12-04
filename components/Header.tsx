@@ -14,7 +14,7 @@ export default function Header({ title }: HeaderProps) {
         <TouchableOpacity onPress={goBack}>
           <ArrowLeftIcon />
         </TouchableOpacity>
-        <Text className="text-dark text-[20px] font-bold leading-[22px]">
+        <Text className=" font-inter-bold text-[20px] leading-[22px]">
           {title}
         </Text>
         {/* view "fantasma" para equilibrar o layout */}

@@ -31,9 +31,11 @@ export default function App() {
         }}
       >
         <View className="gap-6">
-          <Text className="text-center text-4xl font-bold">Rep Finance</Text>
-          <Text className="text-center">
-            Faça login para começar o controle de suas finanças em republica
+          <Text className="font-inter-bold text-center text-4xl">Kontas</Text>
+          <Text className="font-mulish-medium px-2 text-center leading-[22px]">
+            Gerencie com facilidade as contas da sua república. Cadastre
+            moradores, acompanhe pagamentos, defina responsáveis e organize
+            todas as despesas em um só lugar.
           </Text>
         </View>
 
@@ -41,7 +43,9 @@ export default function App() {
           className="mt-6 w-full rounded-lg bg-blue-500 px-4 py-2"
           onPress={handlePress}
         >
-          <Text className="text-center text-lg text-white">Get Started</Text>
+          <Text className="font-inter-medium text-center text-lg text-white">
+            Entrar
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

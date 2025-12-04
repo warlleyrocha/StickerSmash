@@ -32,14 +32,14 @@ export default function InputField({
   return (
     <View className="w-full gap-[10px]">
       <Text
-        className="mb-2 text-[16px] font-medium leading-[18px] text-gray-700"
+        className="font-inter-semibold mb-2 text-[16px] leading-[18px] text-gray-700"
         {...labelProps}
       >
         {label}
       </Text>
 
       <TextInput
-        className="mb-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-lg text-gray-900"
+        className="font-mulish-medium mb-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-lg text-gray-900"
         placeholder={placeholder || label}
         placeholderTextColor="#999"
         value={value}
