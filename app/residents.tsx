@@ -69,6 +69,7 @@ export default function Residents() {
       await AsyncStorage.setItem("@republica_data", JSON.stringify(republica));
       router.replace("/dashboard");
     } catch (error) {
+      console.error("Error saving republic data:", error);
       Alert.alert("Erro", "Não foi possível salvar. Tente novamente.");
     }
   };

@@ -14,7 +14,6 @@ interface InputFieldProps {
     | "phone-pad"
     | "decimal-pad";
   editable?: boolean;
-  animatedLabel?: boolean;
   labelProps?: TextProps;
   inputProps?: TextInputProps;
 }
@@ -27,28 +26,21 @@ export default function InputField({
   secureTextEntry = false,
   keyboardType = "default",
   editable = true,
-  animatedLabel = false,
   labelProps,
   inputProps,
 }: Readonly<InputFieldProps>) {
-  const hasValue = value.length > 0;
-  const shouldShowLabel = animatedLabel ? hasValue : true;
-  const placeholderText = animatedLabel && !hasValue ? label : placeholder;
-
   return (
     <View className="w-full gap-[10px]">
-      {shouldShowLabel && (
-        <Text
-          className="mb-2 text-[16px] font-medium leading-[18px] text-gray-700"
-          {...labelProps}
-        >
-          {label}
-        </Text>
-      )}
+      <Text
+        className="mb-2 text-[16px] font-medium leading-[18px] text-gray-700"
+        {...labelProps}
+      >
+        {label}
+      </Text>
 
       <TextInput
         className="mb-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-lg text-gray-900"
-        placeholder={placeholderText || label}
+        placeholder={placeholder || label}
         placeholderTextColor="#999"
         value={value}
         onChangeText={onChangeText}
