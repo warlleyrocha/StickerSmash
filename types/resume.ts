@@ -23,6 +23,7 @@ export type Conta = {
 };
 
 export type Republica = {
+  nome: string;
   moradores: Morador[];
   contas: Conta[];
 };

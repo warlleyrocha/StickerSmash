@@ -1,69 +1,50 @@
 import React, { useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { AccountsTab } from "@/components/Accounts";
 import { AddAccountModal } from "@/components/AddAccountModal";
 import { ResidentsTab } from "@/components/ResidentsPage";
 import { ResumeTab } from "@/components/Resume";
 import Tabs from "@/components/Tabs";
+import { useAsyncStorage } from "@/hooks/useAsyncStorage";
 
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
 
 const ImageHeader = require("@/assets/images/icon.png");
 
-export const mockRepublica: Republica = {
-  moradores: [
-    { id: "m1", nome: "Ana", chavePix: "ana@pix" },
-    { id: "m2", nome: "Bruno" },
-    { id: "m3", nome: "Carla", chavePix: "carla@pix" },
-    { id: "m4", nome: "Diego" },
-  ],
-
-  contas: [
-    {
-      id: "c1",
-      descricao: "Conta de Luz",
-      valor: 200,
-      vencimento: "2025-11-10",
-      pago: false,
-      responsavelId: "m1",
-      metodoPagamento: "PIX",
-      responsaveis: [
-        { moradorId: "m1", valor: 50 },
-        { moradorId: "m2", valor: 150 },
-      ],
-    },
-    {
-      id: "c2",
-      descricao: "Internet",
-      valor: 150,
-      vencimento: "2025-10-05",
-      pago: true,
-      pagoEm: "2025-11-06",
-      responsavelId: "m3",
-      metodoPagamento: "Crédito",
-      responsaveis: [{ moradorId: "m3", valor: 150 }],
-    },
-    {
-      id: "c3",
-      descricao: "Água",
-      valor: 100,
-      vencimento: "2025-11-12",
-      pago: false,
-      responsavelId: "m4",
-      metodoPagamento: "PIX",
-      responsaveis: [{ moradorId: "m4", valor: 100 }],
-    },
-  ],
+const initialRepublica: Republica = {
+  nome: "",
+  moradores: [],
+  contas: [],
 };
 
 export default function Dashboard() {
   const [tab, setTab] = useState<TabKey>("resumo");
 
-  // 🔥 Agora o mock controla completamente a tela
-  const [republica, setRepublica] = useState<Republica>(mockRepublica);
+  // Usar AsyncStorage para persistir dados
+  const {
+    data: republica,
+    setData: setRepublica,
+    isLoading,
+  } = useAsyncStorage<Republica>(initialRepublica);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Mostrar loading enquanto carrega dados
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-[#FAFAFA]">
+        <ActivityIndicator size="large" color="#000" />
+        <Text className="mt-4 text-gray-600">Carregando...</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
@@ -77,7 +58,9 @@ export default function Dashboard() {
         </View>
 
         <View className="flex-1 justify-center">
-          <Text className="text-base font-semibold">Cachorro Quente</Text>
+          <Text className="text-base font-semibold">
+            {republica.nome || "República"}
+          </Text>
           <Text className="text-sm text-gray-500">
             {republica.moradores.length} moradores
           </Text>

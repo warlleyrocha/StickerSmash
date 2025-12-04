@@ -1,8 +1,11 @@
 import Header from "@/components/Header";
 import InputField from "@/components/ui/input-field";
+import type { Republica } from "@/types/resume";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Alert,
   FlatList,
   ScrollView,
   Text,
@@ -21,6 +24,15 @@ export default function Residents() {
   const [residentName, setResidentName] = useState("");
   const [pixKey, setPixKey] = useState("");
   const [residents, setResidents] = useState<Resident[]>([]);
+  const [republicName, setRepublicName] = useState("");
+
+  useEffect(() => {
+    const loadRepublicName = async () => {
+      const nome = await AsyncStorage.getItem("@republica_nome");
+      if (nome) setRepublicName(nome);
+    };
+    loadRepublicName();
+  }, []);
 
   const handleAddResident = () => {
     if (residentName.trim() && pixKey.trim()) {
@@ -37,8 +49,28 @@ export default function Residents() {
     setResidents(residents.filter((resident) => resident.id !== id));
   };
 
-  const handlePress = () => {
-    router.push("/dashboard");
+  const handlePress = async () => {
+    if (residents.length === 0) {
+      Alert.alert("Atenção", "Adicione pelo menos um morador para continuar");
+      return;
+    }
+
+    try {
+      const republica: Republica = {
+        nome: republicName,
+        moradores: residents.map((r) => ({
+          id: r.id,
+          nome: r.name,
+          chavePix: r.pixKey || undefined,
+        })),
+        contas: [],
+      };
+
+      await AsyncStorage.setItem("@republica_data", JSON.stringify(republica));
+      router.replace("/dashboard");
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível salvar. Tente novamente.");
+    }
   };
 
   return (
