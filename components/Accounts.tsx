@@ -271,10 +271,7 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
             {/* Copiar PIX */}
             {!conta.pago && responsavel?.chavePix && (
               <TouchableOpacity
-                onPress={(e) => {
-                  e.stopPropagation();
-                  copiarChavePix(conta);
-                }}
+                onPress={() => copiarChavePix(conta)}
                 className="flex-row items-center justify-center rounded-md border border-indigo-600 px-4 py-2"
               >
                 {copiadoId === conta.id ? (

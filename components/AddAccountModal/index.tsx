@@ -68,7 +68,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
           <View className="max-h-[90%] rounded-xl bg-white px-6 pt-6">
             {/* header */}
             <View className="mb-3 flex-row items-center justify-between">
-              <View style={{ flex: 1, alignItems: "center" }}>
+              <View>
                 <Text className="text-lg font-semibold">
                   {contaParaEditar ? "Editar Conta" : "Nova Conta"}
                 </Text>
@@ -78,11 +78,8 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                     : "Adicione uma nova conta para a república"}
                 </Text>
               </View>
-              <TouchableOpacity
-                onPress={onClose}
-                className="absolute right-4 top-0 p-2"
-              >
-                <Feather name="x" size={20} color="#374151" />
+              <TouchableOpacity onPress={onClose} className="p-2">
+                <Feather name="x" size={24} color="#374151" />
               </TouchableOpacity>
             </View>
 

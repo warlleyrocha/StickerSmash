@@ -108,7 +108,22 @@ export default function useAddConta({
         valores[r.moradorId] = r.valor.toFixed(2);
       });
       setValoresByMorador(valores);
-      setTipoDivisao("custom");
+
+      // Detectar se a divisão é igual ou customizada
+      const total = contaParaEditar.valor;
+      const isEqual = contaParaEditar.responsaveis.every((r, i, arr) => {
+        if (arr.length === 0) return true;
+        const expectedEqual = Number((total / arr.length).toFixed(2));
+        // Último pode ter ajuste de centavos
+        if (i === arr.length - 1) {
+          const somaPrev = expectedEqual * (arr.length - 1);
+          const expectedLast = Number((total - somaPrev).toFixed(2));
+          return Math.abs(r.valor - expectedLast) < 0.01;
+        }
+        return Math.abs(r.valor - expectedEqual) < 0.01;
+      });
+
+      setTipoDivisao(isEqual ? "equal" : "custom");
     }
   }, [contaParaEditar, visible]);
 
@@ -130,7 +145,8 @@ export default function useAddConta({
       ids.length > 0
     ) {
       setValoresByMorador(() => computeEqualSplit(total, ids));
-    } else {
+    } else if (tipoDivisao === "custom") {
+      // No modo custom, zerar todos os valores
       const zeros: Record<string, string> = {};
       ids.forEach((id) => (zeros[id] = "0.00"));
       setValoresByMorador(zeros);
