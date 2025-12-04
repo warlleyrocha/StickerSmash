@@ -102,7 +102,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
           </Text>
         </View>
 
-        <View className="space-y-3">
+        <View className="gap-3 space-y-3">
           {republica.moradores.map((morador) => {
             const valor = dividas[morador.id] ?? 0;
             const isPendente = valor > 0;

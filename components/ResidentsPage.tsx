@@ -162,22 +162,12 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
     );
   };
 
+  const renderItemSeparator = () => <View className="h-4" />;
+
   return (
     <View className="space-y-4">
       {/* botão adicionar */}
-      {!adicionando ? (
-        <TouchableOpacity
-          onPress={() => setAdicionando(true)}
-          className="mb-5 mt-2 items-center rounded-md bg-indigo-600 py-3"
-        >
-          <View className="flex-row items-center">
-            <Feather name="plus" size={16} color="#fff" />
-            <Text className="ml-2 font-medium text-white">
-              Adicionar Morador
-            </Text>
-          </View>
-        </TouchableOpacity>
-      ) : (
+      {adicionando ? (
         <View className="rounded-lg border border-indigo-200 bg-indigo-50 p-4">
           <View className="mb-3">
             <Text className="text-base font-semibold">Novo Morador</Text>
@@ -231,6 +221,18 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
             </View>
           </View>
         </View>
+      ) : (
+        <TouchableOpacity
+          onPress={() => setAdicionando(true)}
+          className="mb-5 mt-2 items-center rounded-md bg-indigo-600 py-3"
+        >
+          <View className="flex-row items-center">
+            <Feather name="plus" size={16} color="#fff" />
+            <Text className="ml-2 font-medium text-white">
+              Adicionar Morador
+            </Text>
+          </View>
+        </TouchableOpacity>
       )}
 
       {/* lista de moradores */}
@@ -238,8 +240,10 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
         data={republica.moradores}
         keyExtractor={(m) => m.id}
         renderItem={renderMorador}
-        ItemSeparatorComponent={() => <View className="h-5" />}
+        ItemSeparatorComponent={renderItemSeparator}
         contentContainerStyle={{ paddingBottom: 130 }}
+        scrollEnabled={false}
+        nestedScrollEnabled={false}
       />
     </View>
   );

@@ -10,7 +10,7 @@ import Tabs from "@/components/Tabs";
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
 
-import ImageHeader from "@/assets/images/android-icon-monochrome.png";
+const ImageHeader = require("@/assets/images/icon.png");
 
 export const mockRepublica: Republica = {
   moradores: [

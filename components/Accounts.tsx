@@ -21,7 +21,7 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
           ? {
               ...conta,
               pago: !conta.pago,
-              pagoEm: !conta.pago ? new Date().toISOString() : undefined,
+              pagoEm: conta.pago ? new Date().toISOString() : undefined,
             }
           : conta
       ),
