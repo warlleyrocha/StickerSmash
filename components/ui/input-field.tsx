@@ -14,6 +14,7 @@ interface InputFieldProps {
     | "phone-pad"
     | "decimal-pad";
   editable?: boolean;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
   labelProps?: TextProps;
   inputProps?: TextInputProps;
 }
@@ -26,20 +27,21 @@ export default function InputField({
   secureTextEntry = false,
   keyboardType = "default",
   editable = true,
+  autoCapitalize = "sentences",
   labelProps,
   inputProps,
 }: Readonly<InputFieldProps>) {
   return (
     <View className="w-full gap-[10px]">
       <Text
-        className="font-inter-semibold mb-2 text-[16px] leading-[18px] text-gray-700"
+        className="mb-2 font-inter-semibold text-[16px] leading-[18px] text-gray-700"
         {...labelProps}
       >
         {label}
       </Text>
 
       <TextInput
-        className="font-mulish-medium mb-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-lg text-gray-900"
+        className="mb-2 rounded-lg border border-gray-300 bg-white px-4 py-3 font-mulish-medium text-lg text-gray-900"
         placeholder={placeholder || label}
         placeholderTextColor="#999"
         value={value}
@@ -47,6 +49,7 @@ export default function InputField({
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
         editable={editable}
+        autoCapitalize={autoCapitalize}
         {...inputProps}
       />
     </View>

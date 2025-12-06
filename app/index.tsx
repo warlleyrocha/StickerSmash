@@ -23,7 +23,7 @@ export default function App() {
       />
 
       <View
-        className="mt-8 w-full  items-center justify-between overflow-hidden rounded-3xl rounded-t-[24px] bg-white px-6 py-8 shadow-lg"
+        className="mt-8 w-full  items-center justify-between overflow-hidden rounded-t-[24px] bg-white px-6 py-8 shadow-lg"
         style={{
           marginTop: -25, // Sobreposição sobre o background
           paddingTop: 40, // Espaço para compensar a sobreposição
@@ -31,8 +31,8 @@ export default function App() {
         }}
       >
         <View className="gap-6">
-          <Text className="font-inter-bold text-center text-4xl">Kontas</Text>
-          <Text className="font-mulish-medium px-2 text-center leading-[22px]">
+          <Text className="text-center font-inter-bold text-4xl">Kontas</Text>
+          <Text className="px-2 text-center font-mulish-medium leading-[22px]">
             Gerencie com facilidade as contas da sua república. Cadastre
             moradores, acompanhe pagamentos, defina responsáveis e organize
             todas as despesas em um só lugar.
@@ -40,10 +40,10 @@ export default function App() {
         </View>
 
         <TouchableOpacity
-          className="mt-6 w-full rounded-lg bg-blue-500 px-4 py-2"
+          className="mt-6 w-full rounded-lg bg-indigo-600 px-4 py-2"
           onPress={handlePress}
         >
-          <Text className="font-inter-medium text-center text-lg text-white">
+          <Text className="text-center font-inter-medium text-lg text-white">
             Entrar
           </Text>
         </TouchableOpacity>

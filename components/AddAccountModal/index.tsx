@@ -139,12 +139,14 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                   className="flex-row items-center justify-between rounded border border-gray-200 bg-gray-50 px-3 py-2"
                   onPress={() => {
                     // placeholder: ciclo simples entre algumas opções (pode trocar p/ menu)
-                    const next =
-                      metodoPagamento === "PIX"
-                        ? "Cartão"
-                        : metodoPagamento === "Cartão"
-                          ? "Dinheiro"
-                          : "PIX";
+                    let next: string;
+                    if (metodoPagamento === "PIX") {
+                      next = "Cartão";
+                    } else if (metodoPagamento === "Cartão") {
+                      next = "Dinheiro";
+                    } else {
+                      next = "PIX";
+                    }
                     setMetodoPagamento(next);
                   }}
                 >
@@ -267,7 +269,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                       // nada extra por enquanto
                     }
                   }}
-                  className="flex-1 items-center rounded-md bg-black py-3"
+                  className="flex-1 items-center rounded-md bg-indigo-600 py-3"
                 >
                   <Text className="font-medium text-white">
                     Adicionar Conta

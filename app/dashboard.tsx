@@ -104,7 +104,7 @@ export default function Dashboard() {
 
         <TouchableOpacity
           onPress={() => setShowAddModal(true)}
-          className="self-center rounded-md bg-black px-4 py-2"
+          className="self-center rounded-md bg-indigo-600 px-4 py-2"
         >
           <Text className="text-white">+ Nova Conta</Text>
         </TouchableOpacity>

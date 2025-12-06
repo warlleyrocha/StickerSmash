@@ -93,7 +93,7 @@ export default function Register() {
             </View>
 
             <Text
-              className="font-inter-semibold text-center leading-[22px] text-white"
+              className="text-center font-inter-semibold leading-[22px] text-white"
               style={{
                 fontSize: width > 400 ? 25 : 24,
                 lineHeight: width > 400 ? 28 : 24,
@@ -129,7 +129,7 @@ export default function Register() {
                   <Feather name="image" size={48} color="#6b7280" />
                 )}
               </View>
-              <Text className="font-mulish mt-3 text-sm text-indigo-600">
+              <Text className="mt-3 font-mulish text-sm text-indigo-600">
                 {republicImage
                   ? "Toque para alterar a imagem"
                   : "Adicionar imagem"}
@@ -151,10 +151,10 @@ export default function Register() {
           <View className="flex-1" />
 
           <TouchableOpacity
-            className="mb-8 w-full rounded-lg bg-blue-500 px-4 py-3"
+            className="mb-8 w-full rounded-lg bg-indigo-600 px-4 py-3"
             onPress={handlePress}
           >
-            <Text className="font-inter-medium text-center text-lg text-white">
+            <Text className="text-center font-inter-medium text-lg text-white">
               Registrar
             </Text>
           </TouchableOpacity>

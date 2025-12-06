@@ -35,7 +35,7 @@ export default function Residents() {
   }, []);
 
   const handleAddResident = () => {
-    if (residentName.trim() && pixKey.trim()) {
+    if (residentName.trim()) {
       setResidents([
         ...residents,
         { id: Date.now().toString(), name: residentName, pixKey: pixKey },
@@ -96,7 +96,7 @@ export default function Residents() {
           />
 
           <TouchableOpacity
-            className="mt-2 items-center justify-center rounded-lg bg-blue-500 px-4 py-3"
+            className="mt-2 items-center justify-center rounded-lg bg-indigo-600 px-4 py-3"
             onPress={handleAddResident}
           >
             <Text className="font-inter-medium text-lg text-white">
@@ -141,7 +141,7 @@ export default function Residents() {
       {/* Botão fixo no rodapé */}
       <View className="pb-6">
         <TouchableOpacity
-          className="w-full rounded-lg bg-blue-500 px-4 py-3"
+          className="w-full rounded-lg bg-indigo-600 px-4 py-3"
           onPress={handlePress}
         >
           <Text className="text-center text-lg font-semibold text-white">
