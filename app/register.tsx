@@ -157,7 +157,7 @@ export default function Register() {
             onPress={handlePress}
           >
             <Text className="text-center font-inter-medium text-lg text-white">
-              Registrar
+              Avançar
             </Text>
           </TouchableOpacity>
         </View>
