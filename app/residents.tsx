@@ -2,12 +2,15 @@ import Header from "@/components/Header";
 import InputField from "@/components/ui/input-field";
 import { useAuth } from "@/contexts";
 import type { Republica } from "@/types/resume";
+import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
   FlatList,
+  Image,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -18,6 +21,7 @@ interface Resident {
   id: string;
   name: string;
   pixKey: string;
+  photo?: string; // Foto do usuário
 }
 
 export default function Residents() {
@@ -25,6 +29,9 @@ export default function Residents() {
   const router = useRouter();
   const [residentName, setResidentName] = useState("");
   const [pixKey, setPixKey] = useState("");
+  const [residentPhoto, setResidentPhoto] = useState<string | undefined>(
+    undefined
+  );
   const [residents, setResidents] = useState<Resident[]>(() => {
     // Inicializa o array com o usuário logado
     if (user?.user) {
@@ -33,6 +40,7 @@ export default function Residents() {
           id: user.user.id,
           name: user.user.name || "",
           pixKey: user.user.email, // Usa o email como chave PIX padrão
+          photo: user.user.photo || undefined, // Adiciona a foto do usuário do Google
         },
       ];
     }
@@ -54,14 +62,49 @@ export default function Residents() {
     loadTempData();
   }, []);
 
+  const handleSelectImage = async () => {
+    try {
+      const permissionResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (permissionResult.granted === false) {
+        Alert.alert(
+          "Permissão necessária",
+          "É necessário permitir o acesso à galeria para selecionar uma imagem"
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setResidentPhoto(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Error selecting image:", error);
+      Alert.alert("Erro", "Não foi possível selecionar a imagem");
+    }
+  };
+
   const handleAddResident = () => {
     if (residentName.trim()) {
       setResidents([
         ...residents,
-        { id: Date.now().toString(), name: residentName, pixKey: pixKey },
+        {
+          id: Date.now().toString(),
+          name: residentName,
+          pixKey: pixKey,
+          photo: residentPhoto,
+        },
       ]);
       setResidentName("");
       setPixKey("");
+      setResidentPhoto(undefined);
     }
   };
 
@@ -83,6 +126,7 @@ export default function Residents() {
           id: r.id,
           nome: r.name,
           chavePix: r.pixKey || undefined,
+          fotoPerfil: r.photo || undefined, // Adiciona a foto do perfil
         })),
         contas: [],
       };
@@ -109,6 +153,29 @@ export default function Residents() {
 
         {/* Formulário */}
         <View className="mb-6 flex-col gap-3">
+          {/* Seleção de Imagem */}
+          <View className="mb-6 w-full items-center">
+            <TouchableOpacity
+              onPress={handleSelectImage}
+              className="items-center"
+            >
+              <View className="h-32 w-32 items-center justify-center rounded-full bg-gray-200">
+                {residentPhoto ? (
+                  <Image
+                    source={{ uri: residentPhoto }}
+                    className="h-32 w-32 rounded-full"
+                  />
+                ) : (
+                  <Feather name="image" size={48} color="#6b7280" />
+                )}
+              </View>
+              <Text className="mt-3 font-mulish text-sm text-indigo-600">
+                {residentPhoto
+                  ? "Toque para alterar a imagem"
+                  : "Adicionar imagem"}
+              </Text>
+            </TouchableOpacity>
+          </View>
           <InputField
             label="Nome"
             placeholder="Digite o nome do morador"
@@ -144,20 +211,35 @@ export default function Residents() {
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
               renderItem={({ item }) => (
-                <View className="mb-3 flex-col rounded-lg bg-gray-50 px-4 py-3">
-                  <View className="mb-2 flex-row items-center justify-between">
-                    <Text className="flex-1 font-semibold text-gray-900">
-                      {item.name}
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => handleRemoveResident(item.id)}
-                    >
-                      <Text className="text-lg text-red-500">×</Text>
-                    </TouchableOpacity>
+                <View className="mb-3 flex-row items-center rounded-lg bg-gray-50 px-4 py-3">
+                  {/* Foto do perfil */}
+                  <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
+                    {item.photo ? (
+                      <Image
+                        source={{ uri: item.photo }}
+                        className="h-12 w-12 rounded-full"
+                      />
+                    ) : (
+                      <Feather name="user" size={20} color="#4f46e5" />
+                    )}
                   </View>
-                  <Text className="text-sm text-gray-600">
-                    PIX: {item.pixKey}
-                  </Text>
+
+                  {/* Informações do morador */}
+                  <View className="flex-1">
+                    <View className="mb-2 flex-row items-center justify-between">
+                      <Text className="flex-1 font-semibold text-gray-900">
+                        {item.name}
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => handleRemoveResident(item.id)}
+                      >
+                        <Text className="text-lg text-red-500">×</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <Text className="text-sm text-gray-600">
+                      PIX: {item.pixKey}
+                    </Text>
+                  </View>
                 </View>
               )}
             />
