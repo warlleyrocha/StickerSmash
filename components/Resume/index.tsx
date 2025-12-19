@@ -2,42 +2,23 @@ import type { Republica } from "@/types/resume";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
+import { useResume } from "./useResume";
 
 interface ResumeTabProps {
   republica: Republica;
 }
 
 export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
-  const totalContas = republica.contas.reduce(
-    (acc, conta) => acc + conta.valor,
-    0
-  );
-
-  const contasPagas = republica.contas
-    .filter((c) => c.pago)
-    .reduce((acc, conta) => acc + conta.valor, 0);
-  const contasPendentes = totalContas - contasPagas;
-
-  const calcularDividaPorMorador = () => {
-    const dividas: Record<string, number> = {};
-
-    for (const morador of republica.moradores) {
-      dividas[morador.id] = 0;
-    }
-
-    for (const conta of republica.contas) {
-      for (const resp of conta.responsaveis) {
-        // Só conta como dívida se o responsável específico não pagou
-        if (!resp.pago) {
-          dividas[resp.moradorId] = (dividas[resp.moradorId] || 0) + resp.valor;
-        }
-      }
-    }
-
-    return dividas;
-  };
-
-  const dividas = calcularDividaPorMorador();
+  // Hook que contém toda a lógica de cálculo do resumo
+  const {
+    totalContas,
+    contasPagas,
+    contasPendentes,
+    quantidadeContasPagas,
+    quantidadeContasPendentes,
+    quantidadeTotalContas,
+    dividas,
+  } = useResume(republica);
 
   const resumoCards = [
     {
@@ -55,7 +36,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
       icon: (
         <Ionicons name="checkmark-circle-outline" size={20} color="#16a34a" />
       ),
-      description: `${republica.contas.filter((c) => c.pago).length} de ${republica.contas.length} pagas`,
+      description: `${quantidadeContasPagas} de ${quantidadeTotalContas} pagas`,
       color: "#16a34a",
     },
     {
@@ -63,7 +44,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
       label: "Pendentes",
       value: contasPendentes,
       icon: <Ionicons name="alert-circle-outline" size={20} color="#f97316" />,
-      description: `${republica.contas.filter((c) => !c.pago).length} contas a pagar`,
+      description: `${quantidadeContasPendentes} contas a pagar`,
       color: "#f97316",
     },
   ];
