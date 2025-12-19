@@ -40,6 +40,7 @@ yarn-error.*
 *.tsbuildinfo
 
 /keys
+.scannerwork/
 
 # generated native folders
 /ios
