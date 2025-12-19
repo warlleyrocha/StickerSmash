@@ -1,17 +1,8 @@
 import type { Morador, Republica } from "@/types/resume";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import {
-  FlatList,
-  Image,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { EditResidentsModal } from "../EditResidentsModal";
 import { ResidentCard } from "./ResidentCard";
 import { useResidentsPage } from "./useResidentsPage";
 
@@ -83,94 +74,15 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
       />
 
       {/* Modal de Edição de Morador */}
-      <Modal
+      <EditResidentsModal
         visible={showEditModal}
-        animationType="slide"
-        transparent
-        onRequestClose={fecharEdicaoMorador}
-      >
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={{ flex: 1 }}
-        >
-          <View className="flex-1 justify-end bg-black/40">
-            <View className="rounded-t-2xl bg-white px-6 py-6">
-              {/* Header */}
-              <View className="mb-6 flex-row items-center justify-between">
-                <Text className="text-xl font-semibold">
-                  {moradorParaEditar ? "Editar Morador" : "Novo Morador"}
-                </Text>
-                <TouchableOpacity onPress={fecharEdicaoMorador}>
-                  <Feather name="x" size={24} color="#374151" />
-                </TouchableOpacity>
-              </View>
-
-              {/* Foto de Perfil */}
-              <TouchableOpacity
-                onPress={selecionarImagem}
-                className="mb-6 items-center"
-              >
-                <View className="h-28 w-28 items-center justify-center rounded-full bg-indigo-100">
-                  {editForm.fotoPerfil ? (
-                    <Image
-                      source={{ uri: editForm.fotoPerfil }}
-                      className="h-28 w-28 rounded-full"
-                    />
-                  ) : (
-                    <Feather name="user" size={56} color="#4f46e5" />
-                  )}
-                </View>
-                <Text className="mt-2 text-sm text-indigo-600">
-                  Toque para alterar a foto
-                </Text>
-              </TouchableOpacity>
-
-              {/* Nome */}
-              <View className="mb-4">
-                <Text className="mb-2 text-sm font-semibold text-gray-700">
-                  Nome
-                </Text>
-                <TextInput
-                  value={editForm.nome}
-                  onChangeText={(t) => updateEditFormField("nome", t)}
-                  placeholder="Nome do morador"
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-3"
-                />
-              </View>
-
-              {/* Chave PIX */}
-              <View className="mb-6">
-                <Text className="mb-2 text-sm font-semibold text-gray-700">
-                  Chave PIX (opcional)
-                </Text>
-                <TextInput
-                  value={editForm.chavePix}
-                  onChangeText={(t) => updateEditFormField("chavePix", t)}
-                  placeholder="Email, CPF ou telefone"
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-3"
-                />
-              </View>
-
-              {/* Botões */}
-              <View className="flex-row gap-3 pb-6">
-                <TouchableOpacity
-                  onPress={salvarEdicaoMorador}
-                  className="flex-1 items-center rounded-lg bg-indigo-600 py-3"
-                >
-                  <Text className="font-semibold text-white">Salvar</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={fecharEdicaoMorador}
-                  className="flex-1 items-center rounded-lg border border-gray-300 bg-white py-3"
-                >
-                  <Text className="font-semibold text-gray-700">Cancelar</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+        isEditMode={!!moradorParaEditar}
+        editForm={editForm}
+        onClose={fecharEdicaoMorador}
+        onSave={salvarEdicaoMorador}
+        onSelectImage={selecionarImagem}
+        onUpdateField={updateEditFormField}
+      />
     </View>
   );
 };
