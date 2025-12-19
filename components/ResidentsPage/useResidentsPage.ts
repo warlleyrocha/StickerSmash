@@ -67,7 +67,7 @@ export const useResidentsPage = ({
     setMoradorParaEditar(morador);
     setEditForm({
       nome: morador.nome,
-      chavePix: morador.chavePix || "",
+      chavePix: morador.chavePix ?? "",
       fotoPerfil: morador.fotoPerfil,
     });
     setShowEditModal(true);

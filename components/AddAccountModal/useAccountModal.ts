@@ -6,7 +6,7 @@ import { Alert, Platform } from "react-native";
 /* Helpers puros (exportados para testes) */
 export const toNumber = (s?: string) =>
   parseFloat(
-    (s || "0")
+    (s ?? "0")
       .toString()
       .replace(",", ".")
       .replace(/[^\d.-]/g, "")
@@ -97,7 +97,7 @@ export default function useAddConta({
       setDescricao(contaParaEditar.descricao);
       setValorStr(contaParaEditar.valor.toString());
       setVencimento(new Date(contaParaEditar.vencimento));
-      setMetodoPagamento(contaParaEditar.metodoPagamento || "PIX");
+      setMetodoPagamento(contaParaEditar.metodoPagamento ?? "PIX");
       setResponsavelId(contaParaEditar.responsavelId);
 
       const ids = contaParaEditar.responsaveis.map((r) => r.moradorId);
@@ -230,13 +230,13 @@ export default function useAddConta({
     }
 
     const novaConta: Conta = {
-      id: contaParaEditar?.id || Date.now().toString(),
+      id: contaParaEditar?.id ?? Date.now().toString(),
       descricao: descricao.trim(),
       valor: Number(valor.toFixed(2)),
       vencimento: vencimento.toISOString(),
       pago: contaParaEditar?.pago || false,
       pagoEm: contaParaEditar?.pagoEm,
-      responsavelId: responsavelId!,
+      responsavelId,
       responsaveis,
       metodoPagamento: metodoPagamento || undefined,
     };

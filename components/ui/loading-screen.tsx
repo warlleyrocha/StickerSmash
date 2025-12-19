@@ -2,9 +2,9 @@ import React from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 
 interface LoadingScreenProps {
-  message?: string;
-  color?: string;
-  size?: "small" | "large";
+  readonly message?: string;
+  readonly color?: string;
+  readonly size?: "small" | "large";
 }
 
 /**
@@ -22,11 +22,9 @@ export default function LoadingScreen({
   return (
     <View className="flex-1 items-center justify-center bg-white">
       <ActivityIndicator size={size} color={color} />
-      {message && (
-        <Text className="mt-4 font-inter-medium text-lg text-gray-600">
-          {message}
-        </Text>
-      )}
+      <Text className="mt-4 font-inter-medium text-lg text-gray-600">
+        {message}
+      </Text>
     </View>
   );
 }

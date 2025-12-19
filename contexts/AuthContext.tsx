@@ -9,6 +9,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 
@@ -163,16 +164,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  const contextValue = useMemo(
+    () => ({
+      user,
+      isLoading,
+      signIn,
+      signOut,
+    }),
+    [user, isLoading]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        signIn,
-        signOut,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 }
