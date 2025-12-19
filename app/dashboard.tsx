@@ -1,18 +1,20 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
 import { AccountsTab } from "@/components/Accounts";
 import { AddAccountModal } from "@/components/AddAccountModal";
 import { EditRepublicModal } from "@/components/EditRepublicModal";
-
 import { ResidentsTab } from "@/components/ResidentsPage";
 import { ResumeTab } from "@/components/Resume";
 import Tabs from "@/components/Tabs";
+
+import { useAuth } from "@/contexts";
 import { useAsyncStorage } from "@/hooks/useAsyncStorage";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
+import { useRouter } from "expo-router";
 
 const ImageHeader = require("@/assets/images/icon.png");
 
@@ -23,6 +25,8 @@ const initialRepublica: Republica = {
 };
 
 export default function Dashboard() {
+  const { signOut } = useAuth();
+  const router = useRouter();
   const [tab, setTab] = useState<TabKey>("resumo");
   const [republicImage, setRepublicImage] = useState<string | undefined>(
     undefined
@@ -49,6 +53,19 @@ export default function Dashboard() {
     setRepublica({ ...republica, nome, imagemRepublica: imagem });
     setRepublicImage(imagem);
   };
+
+  async function handleSignOut() {
+    try {
+      await signOut();
+      router.replace("/");
+    } catch (error) {
+      console.error("Erro ao fazer logout da conta:", error);
+      Alert.alert(
+        "Erro no Logout",
+        "Não foi possível fazer logout da conta. Tente novamente."
+      );
+    }
+  }
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
@@ -90,6 +107,13 @@ export default function Dashboard() {
           className="self-center rounded-md bg-indigo-600 px-4 py-2"
         >
           <Text className="text-white">+ Nova Conta</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleSignOut}
+          className="self-center rounded-md bg-[#ebebeb] px-4 py-2 shadow"
+        >
+          <Text>Logout</Text>
         </TouchableOpacity>
       </View>
 
