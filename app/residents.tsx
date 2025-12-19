@@ -38,9 +38,9 @@ export default function Residents() {
       return [
         {
           id: user.user.id,
-          name: user.user.name || "",
+          name: user.user.name ?? "",
           pixKey: user.user.email, // Usa o email como chave PIX padrão
-          photo: user.user.photo || undefined, // Adiciona a foto do usuário do Google
+          photo: user.user.photo ?? undefined, // Adiciona a foto do usuário do Google
         },
       ];
     }
@@ -126,13 +126,18 @@ export default function Residents() {
           id: r.id,
           nome: r.name,
           chavePix: r.pixKey || undefined,
-          fotoPerfil: r.photo || undefined, // Adiciona a foto do perfil
+          fotoPerfil: r.photo ?? undefined, // Adiciona a foto do perfil
         })),
         contas: [],
       };
 
       // Salva os dados consolidados
       await AsyncStorage.setItem("@republica_data", JSON.stringify(republica));
+
+      // Salva a imagem da república separadamente
+      if (republicImage) {
+        await AsyncStorage.setItem("@republica_imagem", republicImage);
+      }
 
       // Remove os dados temporários
       await AsyncStorage.removeItem("@temp_republica_nome");

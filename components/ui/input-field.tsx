@@ -42,7 +42,7 @@ export default function InputField({
 
       <TextInput
         className="mb-2 rounded-lg border border-gray-300 bg-white px-4 py-3 font-mulish-medium text-lg text-gray-900"
-        placeholder={placeholder || label}
+        placeholder={placeholder ?? label}
         placeholderTextColor="#999"
         value={value}
         onChangeText={onChangeText}
