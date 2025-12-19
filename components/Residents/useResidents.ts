@@ -4,15 +4,15 @@ import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Alert } from "react-native";
 
-interface UseResidentsPageProps {
+interface UseResidentsProps {
   republica: Republica;
   setRepublica: (rep: Republica) => void;
 }
 
-export const useResidentsPage = ({
+export const useResidents = ({
   republica,
   setRepublica,
-}: UseResidentsPageProps) => {
+}: UseResidentsProps) => {
   const [copiadoId, setCopiadoId] = useState<string | null>(null);
   const [moradorParaEditar, setMoradorParaEditar] = useState<Morador | null>(
     null

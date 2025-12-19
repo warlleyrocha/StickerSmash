@@ -5,7 +5,7 @@ import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 import { AccountsTab } from "@/components/Accounts";
 import { AddAccountModal } from "@/components/AddAccountModal";
 import { EditRepublicModal } from "@/components/EditRepublicModal";
-import { ResidentsTab } from "@/components/ResidentsPage";
+import { ResidentsTab } from "@/components/Residents";
 import { ResumeTab } from "@/components/Resume";
 import Tabs from "@/components/Tabs";
 
