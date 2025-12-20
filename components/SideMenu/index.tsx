@@ -26,6 +26,9 @@ export interface MenuItem {
 interface UserInfo {
   name: string;
   photo?: string | null;
+  email?: string | null;
+  pixKey?: string | null;
+  phone?: string | null;
 }
 
 interface SideMenuProps {
@@ -133,6 +136,9 @@ export function SideMenu({
                 )}
               </View>
               <Text className="text-lg font-semibold">{user.name}</Text>
+              <Text className="text-sm text-gray-500">{user.email}</Text>
+              <Text className="text-sm text-gray-500">{user.phone}</Text>
+              <Text className="text-sm text-gray-500">{user.pixKey}</Text>
             </View>
 
             {/* Menu Items */}

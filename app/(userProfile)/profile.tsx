@@ -1,6 +1,8 @@
+import { PROFILE_COMPLETE_STORAGE_KEY } from "@/constants/storageKeys";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { EditProfileModal } from "@/components/Modals/EditProfileModal";
@@ -96,7 +98,7 @@ export default function SetupProfile() {
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
   // Simula se o usuário tem repúblicas (mude para [] para testar estado vazio)
-  const [republicas] = useState<any[]>(mockRepublicas);
+  const [republicas] = useState<any[]>([]);
 
   // Estado local para dados do perfil
   const [profile, setProfile] = useState<ProfileData>({
@@ -106,6 +108,18 @@ export default function SetupProfile() {
     photo: user?.user.photo ?? undefined,
     phone: "", // Inicializa como string vazia, pois não existe em user.user
   });
+
+  // Estado para flag de perfil completo
+  const [profileComplete, setProfileComplete] = useState(false);
+
+  // Verifica se o perfil está completo ao carregar ou fechar o modal
+  useEffect(() => {
+    const checkProfileComplete = async () => {
+      const flag = await AsyncStorage.getItem(PROFILE_COMPLETE_STORAGE_KEY);
+      setProfileComplete(flag === "true");
+    };
+    checkProfileComplete();
+  }, [showEditProfileModal]);
 
   const handleCreateRepublic = () => {
     router.push("/register/republic");
@@ -157,7 +171,7 @@ export default function SetupProfile() {
   ];
 
   // Função para salvar perfil editado
-  const handleSaveProfile = (
+  const handleSaveProfile = async (
     name: string,
     email: string,
     pixKey?: string,
@@ -165,6 +179,11 @@ export default function SetupProfile() {
     phone?: string
   ) => {
     setProfile({ name, email, pixKey: pixKey ?? "", photo, phone });
+    // Se telefone e chave Pix preenchidos, salva a flag de perfil completo
+    if (phone && pixKey) {
+      await AsyncStorage.setItem(PROFILE_COMPLETE_STORAGE_KEY, "true");
+      setProfileComplete(true);
+    }
     setShowEditProfileModal(false);
   };
 
@@ -202,7 +221,40 @@ export default function SetupProfile() {
       </View>
 
       {/* CONTENT */}
-      {republicas.length > 0 ? (
+      {!profileComplete ? (
+        // 1. PERFIL INCOMPLETO - Mostra card de completar perfil
+        <View className="mt-[-30px] flex-1 items-center justify-center bg-gradient-to-b from-slate-50 to-white px-6">
+          <View className="w-full max-w-md">
+            <View className="rounded-3xl bg-white p-8 shadow-2xl shadow-gray-900/5">
+              <View className="mb-4 self-start rounded-full bg-indigo-50 px-4 py-2">
+                <Text className="text-xs font-semibold text-indigo-600">
+                  QUASE LÁ!
+                </Text>
+              </View>
+
+              <Text className="mb-3 text-2xl font-bold leading-tight text-gray-900">
+                Complete seu perfil
+              </Text>
+
+              <Text className="mb-8 text-base leading-relaxed text-gray-600">
+                Cadastre sua chave PIX e telefone para desbloquear todos os
+                recursos e participar de repúblicas.
+              </Text>
+
+              <TouchableOpacity
+                onPress={() => setShowEditProfileModal(true)}
+                className="w-full overflow-hidden rounded-2xl bg-indigo-600 px-6 py-4 shadow-lg hover:shadow-indigo-300/30 active:scale-95"
+                activeOpacity={0.9}
+              >
+                <Text className="text-center text-[16px] font-bold text-white">
+                  Continuar
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      ) : republicas.length > 0 ? (
+        // 2. PERFIL COMPLETO + TEM REPÚBLICAS - Mostra lista
         <ScrollView className="flex-1 px-6 pt-6">
           <Text className="mb-4 text-lg font-semibold text-gray-800">
             Suas Repúblicas
@@ -231,29 +283,48 @@ export default function SetupProfile() {
           </TouchableOpacity>
         </ScrollView>
       ) : (
+        // 3. PERFIL COMPLETO + SEM REPÚBLICAS - Mostra card vazio
         <View className="flex-1 items-center justify-center px-6">
-          <View className="mb-8 h-24 w-24 items-center justify-center rounded-full bg-gray-100">
-            <Text className="text-4xl">🏠</Text>
+          <View className="w-full max-w-md">
+            <View className="rounded-3xl bg-white p-8 shadow-lg">
+              {/* Ícone ilustrativo */}
+              <View className="mb-6 items-center">
+                <View className="h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                  <Text className="text-4xl">🏘️</Text>
+                </View>
+              </View>
+
+              <Text className="mb-3 text-center text-2xl font-bold text-gray-900">
+                Nenhuma república vinculada
+              </Text>
+
+              <Text className="mb-8 text-center text-base leading-relaxed text-gray-600">
+                Crie sua primeira república ou aguarde um convite para começar a
+                gerenciar despesas compartilhadas.
+              </Text>
+
+              {/* Botão principal */}
+              <TouchableOpacity
+                onPress={handleCreateRepublic}
+                className="mb-3 w-full overflow-hidden rounded-2xl bg-indigo-600 px-6 py-4 shadow-lg shadow-indigo-500/30"
+                activeOpacity={0.9}
+              >
+                <Text className="text-center text-base font-bold text-white">
+                  Criar República
+                </Text>
+              </TouchableOpacity>
+
+              {/* Link secundário */}
+              <TouchableOpacity
+                onPress={() => router.push("/(userProfile)/invites")}
+                activeOpacity={0.7}
+              >
+                <Text className="text-center text-sm font-medium text-indigo-600">
+                  Ver meus convites
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <Text className="mb-2 text-center text-xl font-bold text-gray-800">
-            Nenhuma república vinculada
-          </Text>
-
-          <Text className="mb-8 text-center text-base text-gray-500">
-            Você ainda não possui uma república cadastrada. Crie uma nova para
-            começar a gerenciar as contas e moradores.
-          </Text>
-
-          <TouchableOpacity
-            onPress={handleCreateRepublic}
-            className="w-full rounded-lg bg-indigo-600 px-6 py-4"
-            activeOpacity={0.8}
-          >
-            <Text className="text-center text-base font-semibold text-white">
-              Cadastrar Nova República
-            </Text>
-          </TouchableOpacity>
         </View>
       )}
 
@@ -261,7 +332,13 @@ export default function SetupProfile() {
       <SideMenu
         visible={menuVisible}
         onClose={() => setMenuVisible(false)}
-        user={{ name: profile.name, photo: profile.photo }}
+        user={{
+          name: profile.name,
+          photo: profile.photo,
+          email: profile.email,
+          pixKey: profile.pixKey,
+          phone: profile.phone,
+        }}
         menuItems={menuItems}
         footerItems={footerItems}
       />
