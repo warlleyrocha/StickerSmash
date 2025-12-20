@@ -14,6 +14,7 @@ import { EditProfileFormValues, useEditProfile } from "./useEditProfile";
 
 export interface EditProfileModalProps extends EditProfileFormValues {
   visible: boolean;
+  currentPhone?: string;
 }
 
 export const EditProfileModal: React.FC<EditProfileModalProps> = ({
@@ -23,6 +24,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   currentEmail,
   currentPixKey,
   currentPhoto,
+  currentPhone,
   onSave,
 }) => {
   const {
@@ -37,11 +39,14 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     handleClose,
     handleSave,
     selectPhoto,
+    phone,
+    setPhone,
   } = useEditProfile({
     currentName,
     currentEmail,
     currentPixKey,
     currentPhoto,
+    currentPhone,
     onClose,
     onSave,
   });
@@ -111,7 +116,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
             </View>
 
             {/* Chave Pix */}
-            <View className="mb-6">
+            <View className="mb-4">
               <Text className="mb-2 text-sm font-semibold text-gray-700">
                 Chave Pix
               </Text>
@@ -119,6 +124,21 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 value={pixKey}
                 onChangeText={setPixKey}
                 placeholder="Sua chave Pix"
+                className="rounded-lg border border-gray-300 bg-white px-4 py-3"
+                editable={!isUploading}
+              />
+            </View>
+
+            {/* Telefone */}
+            <View className="mb-6">
+              <Text className="mb-2 text-sm font-semibold text-gray-700">
+                Telefone
+              </Text>
+              <TextInput
+                value={phone}
+                onChangeText={setPhone}
+                placeholder="Seu telefone"
+                keyboardType="phone-pad"
                 className="rounded-lg border border-gray-300 bg-white px-4 py-3"
                 editable={!isUploading}
               />

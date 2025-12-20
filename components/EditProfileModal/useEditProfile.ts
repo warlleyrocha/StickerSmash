@@ -8,11 +8,13 @@ export interface EditProfileFormValues {
   currentEmail: string;
   currentPixKey?: string;
   currentPhoto?: string;
+  currentPhone?: string;
   onSave: (
     name: string,
     email: string,
     pixKey?: string,
-    photo?: string
+    photo?: string,
+    phone?: string
   ) => void;
 }
 
@@ -21,6 +23,7 @@ export function useEditProfile({
   currentEmail,
   currentPixKey,
   currentPhoto,
+  currentPhone,
   onClose,
   onSave,
 }: EditProfileFormValues) {
@@ -28,6 +31,7 @@ export function useEditProfile({
   const [email, setEmail] = useState(currentEmail);
   const [pixKey, setPixKey] = useState(currentPixKey || "");
   const [photoUri, setPhotoUri] = useState(currentPhoto);
+  const [phone, setPhone] = useState(currentPhone || "");
   const [isUploading, setIsUploading] = useState(false);
 
   const handleClose = () => {
@@ -35,20 +39,20 @@ export function useEditProfile({
     setEmail(currentEmail);
     setPixKey(currentPixKey || "");
     setPhotoUri(currentPhoto);
+    setPhone(currentPhone || "");
     setIsUploading(false); // ✅ Reset o estado de loading
     onClose();
   };
 
   const handleSave = async () => {
-    // ✅ Tornar assíncrono
     setIsUploading(true);
     try {
-      onSave(name, email, pixKey, photoUri);
+      onSave(name, email, pixKey, photoUri, phone);
     } catch (error) {
       console.error("Erro ao salvar:", error);
       Alert.alert("Erro", "Não foi possível salvar as alterações.");
     } finally {
-      setIsUploading(false); // ✅ Sempre reseta após salvar
+      setIsUploading(false);
     }
   };
 
@@ -87,6 +91,8 @@ export function useEditProfile({
     setPixKey,
     photoUri,
     setPhotoUri,
+    phone,
+    setPhone,
     isUploading,
     handleClose,
     handleSave,

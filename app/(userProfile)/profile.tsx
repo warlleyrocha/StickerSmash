@@ -85,6 +85,7 @@ interface ProfileData {
   email: string;
   photo?: string;
   pixKey: string;
+  phone?: string;
 }
 
 export default function SetupProfile() {
@@ -103,6 +104,7 @@ export default function SetupProfile() {
     email: user?.user.email ?? "",
     pixKey: "",
     photo: user?.user.photo ?? undefined,
+    phone: "", // Inicializa como string vazia, pois não existe em user.user
   });
 
   const handleCreateRepublic = () => {
@@ -159,9 +161,10 @@ export default function SetupProfile() {
     name: string,
     email: string,
     pixKey?: string,
-    photo?: string
+    photo?: string,
+    phone?: string
   ) => {
-    setProfile({ name, email, pixKey: pixKey ?? "", photo });
+    setProfile({ name, email, pixKey: pixKey ?? "", photo, phone });
     setShowEditProfileModal(false);
   };
 
@@ -271,6 +274,7 @@ export default function SetupProfile() {
         currentEmail={profile.email}
         currentPixKey={profile.pixKey}
         currentPhoto={profile.photo}
+        currentPhone={profile.phone}
         onSave={handleSaveProfile}
       />
     </View>
