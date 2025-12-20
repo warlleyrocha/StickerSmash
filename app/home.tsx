@@ -3,6 +3,7 @@ import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
 import { AddAccountModal } from "@/components/Modals/AddAccountModal";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
+import { MenuButton, SideMenu } from "@/components/SideMenu";
 import Tabs from "@/components/Tabs";
 import { AccountsTab } from "@/components/Tabs/Accounts";
 import { ResidentsTab } from "@/components/Tabs/Residents";
@@ -25,7 +26,7 @@ const initialRepublica: Republica = {
 };
 
 export default function Home() {
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<TabKey>("resumo");
 
@@ -36,6 +37,44 @@ export default function Home() {
   );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
+
+  const userMenu = {
+    name: user?.user?.name ?? "Usuário",
+    photo: user?.user?.photo,
+    email: user?.user?.email,
+  };
+
+  const menuItems = [
+    {
+      id: "1",
+      label: "Início",
+      icon: "home-outline" as const,
+      onPress: () => router.push("/home"),
+    },
+    {
+      id: "2",
+      label: "Meu Perfil",
+      icon: "person-outline" as const,
+      onPress: () => router.push("/(userProfile)/profile"),
+    },
+    {
+      id: "3",
+      label: "Convites",
+      icon: "mail-outline" as const,
+      onPress: () => router.push("/(userProfile)/invites"),
+    },
+  ];
+
+  const footerItems = [
+    {
+      id: "1",
+      label: "Sair",
+      icon: "log-out-outline" as const,
+      onPress: handleSignOut,
+      danger: true,
+    },
+  ];
 
   // Função para salvar edições da república
   const handleSaveRepublica = (nome: string, imagem?: string) => {
@@ -97,12 +136,7 @@ export default function Home() {
           <Text className="text-white">+ Nova Conta</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={handleSignOut}
-          className="self-center rounded-md bg-[#ebebeb] px-4 py-2 shadow"
-        >
-          <Text>Logout</Text>
-        </TouchableOpacity>
+        <MenuButton onPress={() => setMenuVisible(true)} />
       </View>
 
       {/* CONTENT */}
@@ -135,6 +169,14 @@ export default function Home() {
         currentName={republica.nome}
         currentImage={republica.imagemRepublica}
         onSave={handleSaveRepublica}
+      />
+      {/* MENU LATERAL */}
+      <SideMenu
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        user={userMenu}
+        menuItems={menuItems}
+        footerItems={footerItems}
       />
     </View>
   );
