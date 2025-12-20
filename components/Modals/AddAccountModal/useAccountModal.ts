@@ -5,11 +5,11 @@ import { Alert, Platform } from "react-native";
 
 /* Helpers puros (exportados para testes) */
 export const toNumber = (s?: string) =>
-  parseFloat(
+  Number.parseFloat(
     (s ?? "0")
       .toString()
       .replace(",", ".")
-      .replace(/[^\d.-]/g, "")
+      .replaceAll(/[^\d.-]/g, "")
   ) || 0;
 
 export const formatNumber = (n: number) => Number(n).toFixed(2);
@@ -139,7 +139,7 @@ export default function useAddConta({
         : republica.moradores.map((m) => m.id);
 
     if (
-      !isNaN(total) &&
+      !Number.isNaN(total) &&
       total > 0 &&
       tipoDivisao === "equal" &&
       ids.length > 0
@@ -169,7 +169,7 @@ export default function useAddConta({
     () =>
       Object.values(valoresByMorador).reduce((acc, s) => {
         const n = toNumber(s);
-        return acc + (isNaN(n) ? 0 : n);
+        return acc + (Number.isNaN(n) ? 0 : n);
       }, 0),
     [valoresByMorador]
   );
@@ -196,7 +196,7 @@ export default function useAddConta({
       Alert.alert("Preencha a descrição");
       return false;
     }
-    if (isNaN(valor) || valor <= 0) {
+    if (Number.isNaN(valor) || valor <= 0) {
       Alert.alert("Informe um valor válido");
       return false;
     }

@@ -1,4 +1,4 @@
-import useEditRepublicModal from "@/components/EditRepublicModal/useEditRepublicModal";
+import useEditRepublicModal from "@/components/Modals/EditRepublicModal/useEditRepublicModal";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import {

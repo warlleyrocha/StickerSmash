@@ -1,4 +1,4 @@
-import useAddAccount from "@/components/AddAccountModal/useAccountModal";
+import useAddAccount from "@/components/Modals/AddAccountModal/useAccountModal";
 import type { Conta, Republica } from "@/types/resume";
 import { Feather } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";

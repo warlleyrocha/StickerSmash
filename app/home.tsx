@@ -2,12 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
-import { AccountsTab } from "@/components/Accounts";
-import { AddAccountModal } from "@/components/AddAccountModal";
-import { EditRepublicModal } from "@/components/EditRepublicModal";
-import { ResidentsTab } from "@/components/Residents";
-import { ResumeTab } from "@/components/Resume";
+import { AddAccountModal } from "@/components/Modals/AddAccountModal";
+import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
 import Tabs from "@/components/Tabs";
+import { AccountsTab } from "@/components/Tabs/Accounts";
+import { ResidentsTab } from "@/components/Tabs/Residents";
+import { ResumeTab } from "@/components/Tabs/Resume";
 
 import { useAuth } from "@/contexts";
 import { useAsyncStorage } from "@/hooks/useAsyncStorage";

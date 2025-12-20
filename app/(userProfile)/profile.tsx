@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { EditProfileModal } from "@/components/EditProfileModal";
+import { EditProfileModal } from "@/components/Modals/EditProfileModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useAuth } from "@/contexts";
 

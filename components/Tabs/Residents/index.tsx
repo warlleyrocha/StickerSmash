@@ -2,7 +2,7 @@ import type { Morador, Republica } from "@/types/resume";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { EditResidentsModal } from "../EditResidentsModal";
+import { EditResidentsModal } from "../../Modals/EditResidentsModal";
 import { ResidentCard } from "./ResidentCard";
 import { useResidents } from "./useResidents";
 

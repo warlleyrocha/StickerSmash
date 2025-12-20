@@ -2,7 +2,7 @@ import { DeleteButton } from "@/components/ui/delete-button";
 import type { Conta, Republica } from "@/types/resume";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { AddAccountModal } from "../AddAccountModal";
+import { AddAccountModal } from "../../Modals/AddAccountModal";
 import { useAccounts } from "./useAccounts";
 
 interface AccountsTabProps {
