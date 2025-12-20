@@ -54,10 +54,10 @@ function AppNavigator() {
         if (isComplete) {
           router.replace("/home");
         } else {
-          router.replace("/register");
+          router.replace("/onboarding");
         }
       } else {
-        router.replace("/login");
+        router.replace("/(auth)/login");
       }
     };
 
@@ -72,9 +72,27 @@ function AppNavigator() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" options={{ headerTitle: "Index" }} />
-      <Stack.Screen name="login" options={{ headerTitle: "Login" }} />
-      <Stack.Screen name="register" options={{ headerTitle: "Register" }} />
-      <Stack.Screen name="residents" options={{ headerTitle: "Residents" }} />
+      <Stack.Screen name="(auth)/login" options={{ headerTitle: "Login" }} />
+      <Stack.Screen
+        name="onboarding/index"
+        options={{ headerTitle: "Onboarding" }}
+      />
+      <Stack.Screen
+        name="(userProfile)/profile"
+        options={{ headerTitle: "User Profile" }}
+      />
+      <Stack.Screen
+        name="(userProfile)/invites"
+        options={{ headerTitle: "Invites" }}
+      />
+      <Stack.Screen
+        name="register/republic"
+        options={{ headerTitle: "Register Republic" }}
+      />
+      <Stack.Screen
+        name="register/residents"
+        options={{ headerTitle: "Register Residents" }}
+      />
       <Stack.Screen name="home" options={{ headerTitle: "Home" }} />
     </Stack>
   );

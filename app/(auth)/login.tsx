@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import IconGoogle from "../assets/images/google-icon.svg";
+import IconGoogle from "../../assets/images/google-icon.svg";
 
 const { height } = Dimensions.get("window");
 
@@ -43,7 +43,7 @@ export default function LoginScreen() {
   return (
     <View className="flex-1 items-center bg-white">
       <Image
-        source={require("../assets/images/pexels-olia-danilevich-8093032.jpg")}
+        source={require("../../assets/images/pexels-olia-danilevich-8093032.jpg")}
         style={{
           width: "100%",
           height: height * 0.5,

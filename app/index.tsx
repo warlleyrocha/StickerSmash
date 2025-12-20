@@ -37,12 +37,12 @@ export default function Index() {
 
   // Usuário não autenticado → vai para login
   if (!user) {
-    return <Redirect href="/login" />;
+    return <Redirect href="/(auth)/login" />;
   }
 
   // Usuário autenticado sem dados completos → vai para registro
   if (!hasCompleteData) {
-    return <Redirect href="/register" />;
+    return <Redirect href="/onboarding" />;
   }
 
   // Usuário autenticado com dados completos → vai para dashboard

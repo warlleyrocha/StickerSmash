@@ -59,7 +59,7 @@ export default function Register() {
       if (republicImage) {
         await AsyncStorage.setItem("@temp_republica_imagem", republicImage);
       }
-      router.push("/residents");
+      router.push("/register/residents");
     } catch (error) {
       console.error("Erro ao salvar república:", error);
       Alert.alert("Erro", "Não foi possível salvar. Tente novamente.");

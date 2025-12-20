@@ -9,7 +9,6 @@ import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
-  FlatList,
   Image,
   ScrollView,
   Text,
@@ -17,35 +16,17 @@ import {
   View,
 } from "react-native";
 
-interface Resident {
-  id: string;
-  name: string;
-  pixKey: string;
-  photo?: string; // Foto do usuário
-}
-
 export default function Residents() {
   const { user } = useAuth();
   const router = useRouter();
-  const [residentName, setResidentName] = useState("");
-  const [pixKey, setPixKey] = useState("");
+
+  // Inicializa os campos com os dados do usuário logado
+  const [residentName, setResidentName] = useState(user?.user?.name ?? "");
+  const [pixKey, setPixKey] = useState(user?.user?.email ?? "");
+  const [phone, setPhone] = useState("");
   const [residentPhoto, setResidentPhoto] = useState<string | undefined>(
-    undefined
+    user?.user?.photo ?? undefined
   );
-  const [residents, setResidents] = useState<Resident[]>(() => {
-    // Inicializa o array com o usuário logado
-    if (user?.user) {
-      return [
-        {
-          id: user.user.id,
-          name: user.user.name ?? "",
-          pixKey: user.user.email, // Usa o email como chave PIX padrão
-          photo: user.user.photo ?? undefined, // Adiciona a foto do usuário do Google
-        },
-      ];
-    }
-    return [];
-  });
   const [republicName, setRepublicName] = useState("");
   const [republicImage, setRepublicImage] = useState<string | undefined>(
     undefined
@@ -91,58 +72,32 @@ export default function Residents() {
     }
   };
 
-  const handleAddResident = () => {
-    if (residentName.trim()) {
-      setResidents([
-        ...residents,
-        {
-          id: Date.now().toString(),
-          name: residentName,
-          pixKey: pixKey,
-          photo: residentPhoto,
-        },
-      ]);
-      setResidentName("");
-      setPixKey("");
-      setResidentPhoto(undefined);
-    }
-  };
-
-  const handleRemoveResident = (id: string) => {
-    setResidents(residents.filter((resident) => resident.id !== id));
-  };
-
   const handlePress = async () => {
-    if (residents.length === 0) {
-      Alert.alert("Atenção", "Adicione pelo menos um morador para continuar");
+    if (!residentName.trim()) {
+      Alert.alert("Atenção", "Preencha o nome do morador para continuar");
       return;
     }
-
     try {
       const republica: Republica = {
         nome: republicName,
         imagemRepublica: republicImage,
-        moradores: residents.map((r) => ({
-          id: r.id,
-          nome: r.name,
-          chavePix: r.pixKey || undefined,
-          fotoPerfil: r.photo ?? undefined, // Adiciona a foto do perfil
-        })),
+        moradores: [
+          {
+            id: user?.user?.id || Date.now().toString(),
+            nome: residentName,
+            chavePix: pixKey || undefined,
+            telefone: phone || undefined,
+            fotoPerfil: residentPhoto ?? undefined,
+          },
+        ],
         contas: [],
       };
-
-      // Salva os dados consolidados
       await AsyncStorage.setItem("@republica_data", JSON.stringify(republica));
-
-      // Salva a imagem da república separadamente
       if (republicImage) {
         await AsyncStorage.setItem("@republica_imagem", republicImage);
       }
-
-      // Remove os dados temporários
       await AsyncStorage.removeItem("@temp_republica_nome");
       await AsyncStorage.removeItem("@temp_republica_imagem");
-
       router.replace("/home");
     } catch (error) {
       console.error("Error saving republic data:", error);
@@ -154,7 +109,7 @@ export default function Residents() {
     <View className="flex-1 bg-white px-4 pt-6">
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         {/* Cabeçalho */}
-        <Header title="Registrar Moradores" />
+        <Header title="Registrar Morador" />
 
         {/* Formulário */}
         <View className="mb-6 flex-col gap-3">
@@ -188,68 +143,19 @@ export default function Residents() {
             onChangeText={setResidentName}
           />
           <InputField
+            label="Telefone"
+            placeholder="(00) 00000-0000"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+          />
+          <InputField
             label="Chave PIX"
             placeholder="Digite a chave PIX"
             value={pixKey}
             onChangeText={setPixKey}
           />
-
-          <TouchableOpacity
-            className="mt-2 items-center justify-center rounded-lg bg-indigo-600 px-4 py-3"
-            onPress={handleAddResident}
-          >
-            <Text className="font-inter-medium text-lg text-white">
-              + Adicionar Morador
-            </Text>
-          </TouchableOpacity>
         </View>
-
-        {/* Lista */}
-        {residents.length > 0 && (
-          <View className="mb-6">
-            <Text className="mb-3 text-lg font-semibold text-gray-900">
-              Moradores ({residents.length})
-            </Text>
-
-            <FlatList
-              data={residents}
-              keyExtractor={(item) => item.id}
-              scrollEnabled={false}
-              renderItem={({ item }) => (
-                <View className="mb-3 flex-row items-center rounded-lg bg-gray-50 px-4 py-3">
-                  {/* Foto do perfil */}
-                  <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-indigo-100">
-                    {item.photo ? (
-                      <Image
-                        source={{ uri: item.photo }}
-                        className="h-12 w-12 rounded-full"
-                      />
-                    ) : (
-                      <Feather name="user" size={20} color="#4f46e5" />
-                    )}
-                  </View>
-
-                  {/* Informações do morador */}
-                  <View className="flex-1">
-                    <View className="mb-2 flex-row items-center justify-between">
-                      <Text className="flex-1 font-semibold text-gray-900">
-                        {item.name}
-                      </Text>
-                      <TouchableOpacity
-                        onPress={() => handleRemoveResident(item.id)}
-                      >
-                        <Text className="text-lg text-red-500">×</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <Text className="text-sm text-gray-600">
-                      PIX: {item.pixKey}
-                    </Text>
-                  </View>
-                </View>
-              )}
-            />
-          </View>
-        )}
       </ScrollView>
 
       {/* Botão fixo no rodapé */}
