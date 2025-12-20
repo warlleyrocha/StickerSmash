@@ -1,5 +1,4 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
 import { AddAccountModal } from "@/components/Modals/AddAccountModal";
@@ -29,9 +28,6 @@ export default function Home() {
   const { signOut } = useAuth();
   const router = useRouter();
   const [tab, setTab] = useState<TabKey>("resumo");
-  const [republicImage, setRepublicImage] = useState<string | undefined>(
-    undefined
-  );
 
   // Usar AsyncStorage para persistir dados
   const { data: republica, setData: setRepublica } = useAsyncStorage<Republica>(
@@ -41,20 +37,9 @@ export default function Home() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  // Carregar imagem da república
-  useEffect(() => {
-    const loadImage = async () => {
-      const image = await AsyncStorage.getItem("@republica_imagem");
-      if (image) setRepublicImage(image);
-      console.log("Imagem carregada:", image);
-    };
-    loadImage();
-  }, []);
-
   // Função para salvar edições da república
   const handleSaveRepublica = (nome: string, imagem?: string) => {
     setRepublica({ ...republica, nome, imagemRepublica: imagem });
-    setRepublicImage(imagem);
   };
 
   async function handleSignOut() {
@@ -75,9 +60,9 @@ export default function Home() {
       {/* HEADER */}
       <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
         <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-black">
-          {republicImage ? (
+          {republica.imagemRepublica ? (
             <Image
-              source={{ uri: republicImage }}
+              source={{ uri: republica.imagemRepublica }}
               style={{
                 width: 50,
                 height: 50,
@@ -148,7 +133,7 @@ export default function Home() {
         visible={showEditModal}
         onClose={() => setShowEditModal(false)}
         currentName={republica.nome}
-        currentImage={republicImage}
+        currentImage={republica.imagemRepublica}
         onSave={handleSaveRepublica}
       />
     </View>
