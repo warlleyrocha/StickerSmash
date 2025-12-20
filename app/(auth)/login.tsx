@@ -21,10 +21,11 @@ export default function LoginScreen() {
   async function handleGoogleSignIn() {
     if (isSigningIn) return; // Previne múltiplos cliques
 
-    setIsSigningIn(true);
+    setIsSigningIn(true); // Desabilita o botão e mostra o loading
     try {
-      await signIn();
-      // Navegação será feita automaticamente pelo AppNavigator no _layout.tsx
+      await signIn(); // Chama a função de login do contexto
+
+      // Navegação é feita automaticamente pelo AppNavigator no _layout.tsx
     } catch (error) {
       console.error("Erro ao fazer login com Google:", error);
       Alert.alert(
@@ -73,9 +74,9 @@ export default function LoginScreen() {
             isSigningIn ? "bg-gray-300" : "bg-[#ececec]"
           }`}
           onPress={handleGoogleSignIn}
-          disabled={isSigningIn}
+          disabled={isSigningIn} // Desabilita o botão durante o login
         >
-          {isSigningIn ? (
+          {isSigningIn ? ( // Se isSigningIn for true, mostra o ActivityIndicator
             <ActivityIndicator size="small" color="#4F46E5" />
           ) : (
             <>
