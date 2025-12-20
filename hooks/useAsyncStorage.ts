@@ -1,9 +1,8 @@
+import { REPUBLIC_STORAGE_KEY } from "@/constants/storageKeys";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 
 import type { Republica } from "@/types/resume";
-
-const STORAGE_KEY = "@republica_data";
 
 export function useAsyncStorage<T>(initialValue: T) {
   const [data, setData] = useState<T>(initialValue);
@@ -13,7 +12,7 @@ export function useAsyncStorage<T>(initialValue: T) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        const stored = await AsyncStorage.getItem(REPUBLIC_STORAGE_KEY);
         if (stored) {
           setData(JSON.parse(stored));
         }
@@ -31,7 +30,7 @@ export function useAsyncStorage<T>(initialValue: T) {
   useEffect(() => {
     const saveData = async () => {
       try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        await AsyncStorage.setItem(REPUBLIC_STORAGE_KEY, JSON.stringify(data));
       } catch (error) {
         console.error("Erro ao salvar dados:", error);
       }
@@ -52,7 +51,7 @@ export async function checkRepublicaData(): Promise<{
   data: Republica | null;
 }> {
   try {
-    const stored = await AsyncStorage.getItem(STORAGE_KEY);
+    const stored = await AsyncStorage.getItem(REPUBLIC_STORAGE_KEY);
     if (!stored) {
       return { isComplete: false, data: null };
     }

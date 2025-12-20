@@ -1,3 +1,4 @@
+import { USER_STORAGE_KEY } from "@/constants/storageKeys";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   GoogleSignin,
@@ -26,7 +27,6 @@ Este contexto será usado para compartilhar os dados de autenticação em toda a
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 // Chave usada para salvar os dados do usuário no AsyncStorage
-const USER_STORAGE_KEY = "@kontas:user";
 
 // Hook personalizado para acessar o contexto de autenticação, para acessar os dados de autenticação use este hook em qualquer componente
 export function useAuth() {
