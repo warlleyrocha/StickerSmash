@@ -1,15 +1,21 @@
 import { AddAccountModal } from "@/components/Modals/AddAccountModal";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
-import { MenuButton, MenuItem, SideMenu } from "@/components/SideMenu";
+import { MenuButton, SideMenu } from "@/components/SideMenu";
 import Tabs from "@/components/Tabs";
 import { AccountsTab } from "@/components/Tabs/Accounts";
 import { ResidentsTab } from "@/components/Tabs/Residents";
 import { ResumeTab } from "@/components/Tabs/Resume";
+
 import { REPUBLIC_STORAGE_KEY } from "@/constants/storageKeys";
+
 import { useAuth } from "@/contexts";
+
 import { useAsyncStorage } from "@/hooks/useAsyncStorage";
+import { useSideMenu } from "@/hooks/useSideMenu";
+
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
+
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
@@ -52,8 +58,8 @@ function RepublicImage({ imageUri, size = 50 }: RepublicImageProps) {
 }
 
 export default function Home() {
-  const { user, signOut } = useAuth();
   const router = useRouter();
+  const { user, signOut } = useAuth();
   const [tab, setTab] = useState<TabKey>("resumo");
 
   const { data: republica, setData: setRepublica } = useAsyncStorage<Republica>(
@@ -78,24 +84,14 @@ export default function Home() {
     }
   }, [signOut, router]);
 
+  const { menuItems, footerItems } = useSideMenu("home", handleSignOut);
+
   const handleSaveRepublica = useCallback(
     (nome: string, imagem?: string) => {
       setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
     },
     [setRepublica]
   );
-
-  const handleGoHome = useCallback(() => {
-    router.push("/home");
-  }, [router]);
-
-  const handleGoProfile = useCallback(() => {
-    router.push("/(userProfile)/profile");
-  }, [router]);
-
-  const handleGoInvites = useCallback(() => {
-    router.push("/(userProfile)/invites");
-  }, [router]);
 
   const userMenu = useMemo(
     () => ({
@@ -104,43 +100,6 @@ export default function Home() {
       email: user?.user?.email,
     }),
     [user?.user?.name, user?.user?.photo, user?.user?.email]
-  );
-
-  const menuItems: MenuItem[] = useMemo(
-    () => [
-      {
-        id: "1",
-        label: "Início",
-        icon: "home-outline" as const,
-        onPress: handleGoHome,
-      },
-      {
-        id: "2",
-        label: "Meu Perfil",
-        icon: "person-outline" as const,
-        onPress: handleGoProfile,
-      },
-      {
-        id: "3",
-        label: "Convites",
-        icon: "mail-outline" as const,
-        onPress: handleGoInvites,
-      },
-    ],
-    [handleGoHome, handleGoProfile, handleGoInvites]
-  );
-
-  const footerItems: MenuItem[] = useMemo(
-    () => [
-      {
-        id: "logout",
-        label: "Sair",
-        icon: "log-out-outline" as const,
-        onPress: handleSignOut,
-        danger: true,
-      },
-    ],
-    [handleSignOut]
   );
 
   const renderHeader = () => (

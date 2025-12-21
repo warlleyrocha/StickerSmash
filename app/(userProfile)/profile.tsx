@@ -4,10 +4,12 @@ import {
   USER_PROFILE_STORAGE_KEY,
 } from "@/constants/storageKeys";
 import { useAsyncStorage } from "@/hooks/useAsyncStorage";
+import { useSideMenu } from "@/hooks/useSideMenu";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
 import EmptyRepublic from "@/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/components/CardsProfile/IncompleteProfile";
@@ -15,8 +17,8 @@ import RepublicList from "@/components/CardsProfile/RepublicList";
 import { EditProfileModal } from "@/components/Modals/EditProfileModal";
 import RepublicCard from "@/components/RepublicCard";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
+
 import { useAuth } from "@/contexts";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /* 
 Mock de repúblicas cadastradas
@@ -118,41 +120,20 @@ export default function SetupProfile() {
     router.push("/home");
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.replace("/");
-  };
+  const handleSignOut = useCallback(async () => {
+    try {
+      await signOut();
+      router.replace("/");
+    } catch (error) {
+      console.error("Erro ao fazer logout da conta:", error);
+      Alert.alert(
+        "Erro no Logout",
+        "Não foi possível fazer logout da conta. Tente novamente."
+      );
+    }
+  }, [signOut, router]);
 
-  const menuItems = [
-    {
-      id: "1",
-      label: "Início",
-      icon: "home-outline" as const,
-      onPress: () => router.push("/(userProfile)/profile"),
-    },
-    {
-      id: "2",
-      label: "Convites",
-      icon: "mail-outline" as const,
-      onPress: () => router.push("/(userProfile)/invites"),
-    },
-    {
-      id: "3",
-      label: "Configurações",
-      icon: "settings-outline" as const,
-      onPress: () => router.push("/(userProfile)/settings"),
-    },
-  ];
-
-  const footerItems = [
-    {
-      id: "1",
-      label: "Sair",
-      icon: "log-out-outline" as const,
-      onPress: handleSignOut,
-      danger: true,
-    },
-  ];
+  const { menuItems, footerItems } = useSideMenu("profile", handleSignOut);
 
   // Função para salvar perfil editado
   const handleSaveProfile = async (

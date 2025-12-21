@@ -1,9 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import React, { useCallback, useState } from "react";
+import {
+  Alert,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { MenuButton, SideMenu } from "@/components/SideMenu";
+
+import { useSideMenu } from "@/hooks/useSideMenu";
+
 import { useAuth } from "@/contexts";
 
 // Mock de convites recebidos
@@ -137,41 +147,20 @@ export default function Invites() {
     setInvites(invites.filter((invite) => invite.id !== id));
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.replace("/");
-  };
+  const handleSignOut = useCallback(async () => {
+    try {
+      await signOut();
+      router.replace("/");
+    } catch (error) {
+      console.error("Erro ao fazer logout da conta:", error);
+      Alert.alert(
+        "Erro no Logout",
+        "Não foi possível fazer logout da conta. Tente novamente."
+      );
+    }
+  }, [signOut, router]);
 
-  const menuItems = [
-    {
-      id: "1",
-      label: "Início",
-      icon: "home-outline" as const,
-      onPress: () => router.push("/home"),
-    },
-    {
-      id: "2",
-      label: "Meu Perfil",
-      icon: "person-outline" as const,
-      onPress: () => router.push("/(userProfile)/profile"),
-    },
-    {
-      id: "3",
-      label: "Convites",
-      icon: "mail-outline" as const,
-      onPress: () => {},
-    },
-  ];
-
-  const footerItems = [
-    {
-      id: "1",
-      label: "Sair",
-      icon: "log-out-outline" as const,
-      onPress: handleSignOut,
-      danger: true,
-    },
-  ];
+  const { menuItems, footerItems } = useSideMenu("invite", handleSignOut);
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">
