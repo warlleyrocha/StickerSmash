@@ -45,6 +45,20 @@ export function useAsyncStorage<T>(key: string, initialValue: T) {
   return { data, setData, isLoading };
 }
 
+// Função utilitária para logar all o conteúdo do AsyncStorage
+export async function logAllAsyncStorage() {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const stores = await AsyncStorage.multiGet(keys);
+    console.log("Conteúdo do AsyncStorage:");
+    stores.forEach(([key, value]) => {
+      console.log(`${key}:`, value);
+    });
+  } catch (e) {
+    console.error("Erro ao ler AsyncStorage:", e);
+  }
+}
+
 // Função utilitária para verificar se os dados da república estão completos
 export async function checkRepublicaData(): Promise<{
   isComplete: boolean;
