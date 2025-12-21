@@ -44,7 +44,7 @@ export default function LoginScreen() {
   return (
     <View className="flex-1 items-center bg-white">
       <Image
-        source={require("../../assets/images/pexels-olia-danilevich-8093032.jpg")}
+        source={require("../../assets/images/image-login.webp")}
         style={{
           width: "100%",
           height: height * 0.5,
