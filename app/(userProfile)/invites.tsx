@@ -119,7 +119,7 @@ function InviteCard({ invite, onAccept, onReject }: InviteCardProps) {
 export default function Invites() {
   const { user, signOut } = useAuth();
   const router = useRouter();
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [invites, setInvites] = useState(mockInvites);
 
   const userName = user?.user?.name ?? "Usuário";
@@ -188,7 +188,7 @@ export default function Invites() {
           </Text>
         </View>
 
-        <MenuButton onPress={() => setMenuVisible(true)} />
+        <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
       {/* CONTENT */}
@@ -233,8 +233,8 @@ export default function Invites() {
 
       {/* MENU LATERAL */}
       <SideMenu
-        visible={menuVisible}
-        onClose={() => setMenuVisible(false)}
+        isOpen={isMenuOpen}
+        onRequestClose={() => setIsMenuOpen(false)}
         user={{ name: userName, photo: userPhoto }}
         menuItems={menuItems}
         footerItems={footerItems}

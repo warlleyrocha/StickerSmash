@@ -32,71 +32,63 @@ interface UserInfo {
 }
 
 interface SideMenuProps {
-  readonly visible: boolean;
-  readonly onClose: () => void;
+  readonly isOpen: boolean;
+  readonly onRequestClose: () => void;
   readonly user: UserInfo;
   readonly menuItems: MenuItem[];
   readonly footerItems?: MenuItem[];
 }
 
 export function SideMenu({
-  visible,
-  onClose,
+  isOpen,
+  onRequestClose,
   user,
   menuItems,
   footerItems,
 }: SideMenuProps) {
-  const slideAnim = useRef(new Animated.Value(MENU_WIDTH)).current;
+  const slideAnim = useRef(new Animated.Value(-MENU_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  // Efeito para controlar animações baseado em isOpen
   useEffect(() => {
-    if (visible) {
+    if (isOpen) {
+      // Abrir menu
       Animated.parallel([
         Animated.timing(slideAnim, {
           toValue: 0,
-          duration: 250,
+          duration: 300,
           useNativeDriver: true,
         }),
         Animated.timing(fadeAnim, {
           toValue: 1,
-          duration: 250,
+          duration: 300,
           useNativeDriver: true,
         }),
       ]).start();
     } else {
+      // Fechar menu
       Animated.parallel([
         Animated.timing(slideAnim, {
-          toValue: MENU_WIDTH,
-          duration: 200,
+          toValue: -MENU_WIDTH,
+          duration: 300,
           useNativeDriver: true,
         }),
         Animated.timing(fadeAnim, {
           toValue: 0,
-          duration: 200,
+          duration: 300,
           useNativeDriver: true,
         }),
       ]).start();
     }
-  }, [visible, slideAnim, fadeAnim]);
+  }, [isOpen, slideAnim, fadeAnim]);
 
   const handleClose = () => {
-    Animated.parallel([
-      Animated.timing(slideAnim, {
-        toValue: MENU_WIDTH,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => onClose());
+    onRequestClose();
   };
 
   return (
     <Modal
-      visible={visible}
+      visible={isOpen}
       transparent
       animationType="none"
       onRequestClose={handleClose}
@@ -136,9 +128,15 @@ export function SideMenu({
                 )}
               </View>
               <Text className="text-lg font-semibold">{user.name}</Text>
-              <Text className="text-sm text-gray-500">{user.email}</Text>
-              <Text className="text-sm text-gray-500">{user.phone}</Text>
-              <Text className="text-sm text-gray-500">{user.pixKey}</Text>
+              {user.email && (
+                <Text className="text-sm text-gray-500">{user.email}</Text>
+              )}
+              {user.phone && (
+                <Text className="text-sm text-gray-500">{user.phone}</Text>
+              )}
+              {user.pixKey && (
+                <Text className="text-sm text-gray-500">{user.pixKey}</Text>
+              )}
             </View>
 
             {/* Menu Items */}

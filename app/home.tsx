@@ -37,7 +37,7 @@ export default function Home() {
   );
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const userMenu = {
     name: user?.user?.name ?? "Usuário",
@@ -136,7 +136,7 @@ export default function Home() {
           <Text className="text-white">+ Nova Conta</Text>
         </TouchableOpacity>
 
-        <MenuButton onPress={() => setMenuVisible(true)} />
+        <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
       {/* CONTENT */}
@@ -172,8 +172,8 @@ export default function Home() {
       />
       {/* MENU LATERAL */}
       <SideMenu
-        visible={menuVisible}
-        onClose={() => setMenuVisible(false)}
+        isOpen={isMenuOpen}
+        onRequestClose={() => setIsMenuOpen(false)}
         user={userMenu}
         menuItems={menuItems}
         footerItems={footerItems}

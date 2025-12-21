@@ -78,7 +78,7 @@ export default function SetupProfile() {
     };
     loadRepublica();
   }, []);
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
 
   // Estado local para dados do perfil usando hook genérico
@@ -209,7 +209,7 @@ export default function SetupProfile() {
           <Text className="text-sm text-gray-500">Configurar perfil</Text>
         </TouchableOpacity>
 
-        <MenuButton onPress={() => setMenuVisible(true)} />
+        <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
 
       {/* CONTENT */}
@@ -247,8 +247,8 @@ export default function SetupProfile() {
 
       {/* MENU LATERAL */}
       <SideMenu
-        visible={menuVisible}
-        onClose={() => setMenuVisible(false)}
+        isOpen={isMenuOpen}
+        onRequestClose={() => setIsMenuOpen(false)}
         user={{
           name: profile.name,
           photo: profile.photo,
