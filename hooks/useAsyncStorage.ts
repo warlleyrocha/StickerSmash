@@ -1,10 +1,10 @@
-import type { Republica } from "@/types/resume";
+import { REPUBLIC_STORAGE_KEY } from "@/constants/storageKeys";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "@republica_data";
+import type { Republica } from "@/types/resume";
 
-export function useAsyncStorage<T>(initialValue: T) {
+export function useAsyncStorage<T>(key: string, initialValue: T) {
   const [data, setData] = useState<T>(initialValue);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -12,7 +12,7 @@ export function useAsyncStorage<T>(initialValue: T) {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const stored = await AsyncStorage.getItem(STORAGE_KEY);
+        const stored = await AsyncStorage.getItem(key);
         if (stored) {
           setData(JSON.parse(stored));
         }
@@ -24,13 +24,13 @@ export function useAsyncStorage<T>(initialValue: T) {
     };
 
     loadData();
-  }, []);
+  }, [key]);
 
   // Salvar dados no AsyncStorage sempre que mudarem
   useEffect(() => {
     const saveData = async () => {
       try {
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        await AsyncStorage.setItem(key, JSON.stringify(data));
       } catch (error) {
         console.error("Erro ao salvar dados:", error);
       }
@@ -40,9 +40,23 @@ export function useAsyncStorage<T>(initialValue: T) {
     if (!isLoading) {
       saveData();
     }
-  }, [data, isLoading]);
+  }, [data, isLoading, key]);
 
   return { data, setData, isLoading };
+}
+
+// Função utilitária para logar all o conteúdo do AsyncStorage
+export async function logAllAsyncStorage() {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const stores = await AsyncStorage.multiGet(keys);
+    console.log("Conteúdo do AsyncStorage:");
+    stores.forEach(([key, value]) => {
+      console.log(`${key}:`, value);
+    });
+  } catch (e) {
+    console.error("Erro ao ler AsyncStorage:", e);
+  }
 }
 
 // Função utilitária para verificar se os dados da república estão completos
@@ -51,7 +65,7 @@ export async function checkRepublicaData(): Promise<{
   data: Republica | null;
 }> {
   try {
-    const stored = await AsyncStorage.getItem(STORAGE_KEY);
+    const stored = await AsyncStorage.getItem(REPUBLIC_STORAGE_KEY);
     if (!stored) {
       return { isComplete: false, data: null };
     }

@@ -3,6 +3,7 @@ export type Morador = {
   nome: string;
   chavePix?: string;
   fotoPerfil?: string;
+  telefone?: string;
 };
 
 export type Responsavel = {

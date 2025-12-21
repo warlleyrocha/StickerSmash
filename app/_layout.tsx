@@ -1,6 +1,6 @@
 import LoadingScreen from "@/components/ui/loading-screen";
+import { ONBOARDING_STORAGE_KEY } from "@/constants/storageKeys";
 import { AuthProvider, useAuth } from "@/contexts";
-import { checkRepublicaData } from "@/hooks/useAsyncStorage";
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -17,11 +17,13 @@ import {
   Mulish_700Bold,
   Mulish_900Black,
 } from "@expo-google-fonts/mulish";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useFonts } from "expo-font";
 import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
+import "../global.css";
 
 // Previne a splash screen de ocultar automaticamente
 SplashScreen.preventAutoHideAsync();
@@ -43,24 +45,21 @@ function AppNavigator() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Se ainda está carregando, não faz nada
       if (isLoading) return;
 
-      // Se há um usuário logado, verifica os dados da república
       if (user) {
-        const { isComplete } = await checkRepublicaData();
-
-        if (isComplete) {
-          router.replace("/dashboard");
+        const onboardingComplete = await AsyncStorage.getItem(
+          ONBOARDING_STORAGE_KEY
+        );
+        if (onboardingComplete === "true") {
+          router.replace("/(userProfile)/profile");
         } else {
-          router.replace("/register");
+          router.replace("/onboarding");
         }
       } else {
-        // Se não há usuário logado, vai para a tela de login
-        router.replace("/");
+        router.replace("/(auth)/login");
       }
     };
-
     checkAuth();
   }, [user, isLoading]);
 
@@ -71,10 +70,29 @@ function AppNavigator() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" options={{ headerTitle: "Home" }} />
-      <Stack.Screen name="register" options={{ headerTitle: "Register" }} />
-      <Stack.Screen name="residents" options={{ headerTitle: "Residents" }} />
-      <Stack.Screen name="dashboard" options={{ headerTitle: "Dashboard" }} />
+      <Stack.Screen name="index" options={{ headerTitle: "Index" }} />
+      <Stack.Screen name="(auth)/login" options={{ headerTitle: "Login" }} />
+      <Stack.Screen
+        name="onboarding/index"
+        options={{ headerTitle: "Onboarding" }}
+      />
+      <Stack.Screen
+        name="(userProfile)/profile"
+        options={{ headerTitle: "User Profile" }}
+      />
+      <Stack.Screen
+        name="(userProfile)/invites"
+        options={{ headerTitle: "Invites" }}
+      />
+      <Stack.Screen
+        name="register/republic"
+        options={{ headerTitle: "Register Republic" }}
+      />
+      <Stack.Screen
+        name="register/residents"
+        options={{ headerTitle: "Register Residents" }}
+      />
+      <Stack.Screen name="home" options={{ headerTitle: "Home" }} />
     </Stack>
   );
 }
@@ -101,7 +119,7 @@ const RootLayout = () => {
 
   useEffect(() => {
     if (loaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync(); // Oculta a splash screen quando as fontes estiverem carregadas
     }
   }, [loaded]);
 
