@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 import IconGoogle from "@/assets/images/google-icon.svg";
 
