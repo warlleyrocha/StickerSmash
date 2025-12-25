@@ -2,7 +2,6 @@ import { AxiosError } from "axios";
 import {
   AuthResponse,
   CompleteProfileRequest,
-  CompleteProfileResponse,
   GoogleLoginRequest,
   User,
 } from "../types/auth.types";
@@ -55,23 +54,13 @@ export const authService = {
   },
 
   // Completar dados do perfil
-  completeProfile: async (
-    data: CompleteProfileRequest
-  ): Promise<CompleteProfileResponse> => {
+  completeProfile: async (data: CompleteProfileRequest): Promise<void> => {
     try {
-      console.log("📝 Completando dados do perfil...");
+      console.log("📤 Enviando dados do perfil para o backend...");
 
-      const response = await api.post<CompleteProfileResponse>(
-        "/auth/completar-dados",
-        data
-      );
+      await api.post("/auth/completar-dados", data);
 
-      console.log("🔎 [auth.service] Dados enviados para API:", data);
-      console.log("🔎 [auth.service] Resposta bruta da API:", response);
-      console.log("🔎 [auth.service] response.data:", response.data);
-
-      console.log("✅ Perfil completado com sucesso");
-      return response.data;
+      console.log("✅ Perfil completado com sucesso no backend");
     } catch (error) {
       console.error("❌ Erro ao completar perfil:", error);
 
@@ -82,7 +71,9 @@ export const authService = {
               "Dados inválidos. Verifique os campos e tente novamente."
             );
           case 401:
-            throw new Error("Não autorizado. Faça login novamente.");
+            throw new Error("Sessão expirada. Faça login novamente.");
+          case 500:
+            throw new Error("Erro no servidor. Tente novamente mais tarde.");
           default:
             throw new Error(error.message || "Erro ao completar perfil");
         }

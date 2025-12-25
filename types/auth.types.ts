@@ -19,15 +19,6 @@ export interface CompleteProfileRequest {
   fotoPerfil?: string;
 }
 
-export interface CompleteProfileResponse {
-  id: string;
-  nome: string;
-  email: string;
-  telefone: string;
-  chavePix: string;
-  fotoPerfil: string;
-}
-
 export interface AuthResponse {
   user: User;
   token: string;
