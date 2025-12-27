@@ -6,12 +6,10 @@ import EmptyRepublic from "@/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/components/CardsProfile/IncompleteProfile";
 import { EditProfileModal } from "@/components/Modals/EditProfileModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
+import { useSideMenu } from "@/components/SideMenu/useSideMenu";
+import { useAuth } from "@/contexts";
 import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
-
-import { useSideMenu } from "@/components/SideMenu/useSideMenu";
-
-import { useAuth } from "@/contexts";
 
 export default function SetupProfile() {
   const router = useRouter();
@@ -133,7 +131,7 @@ export default function SetupProfile() {
         // 🎯 Perfil completo - mostra mensagem temporária
         <EmptyRepublic
           onCreateRepublic={handleCreateRepublic}
-          onViewInvites={() => router.push("/(auth)/checkEmail")}
+          onViewInvites={() => router.push("/(userProfile)/invites")}
         />
       ) : (
         // 🎯 Perfil incompleto - mostra card para completar
