@@ -5,13 +5,11 @@ import { Alert } from "react-native";
 export interface EditProfileFormValues {
   onClose: () => void;
   currentName: string;
-  currentEmail: string;
   currentPixKey?: string;
   currentPhoto?: string;
   currentPhone?: string;
   onSave: (
     name: string,
-    email: string,
     pixKey?: string,
     photo?: string,
     phone?: string
@@ -20,7 +18,6 @@ export interface EditProfileFormValues {
 
 export function useEditProfile({
   currentName,
-  currentEmail,
   currentPixKey,
   currentPhoto,
   currentPhone,
@@ -28,7 +25,6 @@ export function useEditProfile({
   onSave,
 }: EditProfileFormValues) {
   const [name, setName] = useState(currentName);
-  const [email, setEmail] = useState(currentEmail);
   const [pixKey, setPixKey] = useState(currentPixKey ?? "");
   const [photoUri, setPhotoUri] = useState(currentPhoto);
   const [phone, setPhone] = useState(currentPhone ?? "");
@@ -36,7 +32,6 @@ export function useEditProfile({
 
   const handleClose = () => {
     setName(currentName);
-    setEmail(currentEmail);
     setPixKey(currentPixKey ?? "");
     setPhotoUri(currentPhoto);
     setPhone(currentPhone ?? "");
@@ -47,7 +42,7 @@ export function useEditProfile({
   const handleSave = async () => {
     setIsUploading(true);
     try {
-      onSave(name, email, pixKey, photoUri, phone);
+      onSave(name, pixKey, photoUri, phone);
     } catch (error) {
       console.error("Erro ao salvar:", error);
       Alert.alert("Erro", "Não foi possível salvar as alterações.");
@@ -85,8 +80,6 @@ export function useEditProfile({
   return {
     name,
     setName,
-    email,
-    setEmail,
     pixKey,
     setPixKey,
     photoUri,

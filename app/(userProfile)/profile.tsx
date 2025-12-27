@@ -7,7 +7,7 @@ import IncompleteProfile from "@/components/CardsProfile/IncompleteProfile";
 import { EditProfileModal } from "@/components/Modals/EditProfileModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 
-import { useSideMenu } from "@/hooks/useSideMenu";
+import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 
 import { useAuth } from "@/contexts";
 
@@ -172,7 +172,6 @@ export default function SetupProfile() {
         visible={showEditProfileModal}
         onClose={() => setShowEditProfileModal(false)}
         currentName={user.nome}
-        currentEmail={user.email}
         currentPixKey={user.chavePix}
         currentPhoto={user.fotoPerfil}
         currentPhone={user.telefone}
