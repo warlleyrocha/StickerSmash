@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import InputField from "@/components/ui/input-field";
 import LoadingScreen from "@/components/ui/loading-screen";
 import { useAuth } from "@/contexts/AuthContext";
+import { maskPhone } from "@/utils/inputMasks";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
@@ -53,7 +54,7 @@ const SettingsScreen = () => {
           />
           <InputField
             label="Telefone"
-            value={user.telefone || "Não informado"}
+            value={maskPhone(user.telefone ?? "Não informado")}
             onChangeText={() => {}}
             editable={false}
             keyboardType="phone-pad"

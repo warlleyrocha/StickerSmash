@@ -8,6 +8,7 @@ import { EditProfileModal } from "@/components/Modals/EditProfileModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 import { useAuth } from "@/contexts";
+import { maskPhone } from "@/utils/inputMasks";
 import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
 
@@ -148,7 +149,7 @@ export default function SetupProfile() {
             photo: user.fotoPerfil,
             email: user.email,
             pixKey: user.chavePix,
-            phone: user.telefone,
+            phone: maskPhone(user.telefone ?? ""),
           }}
           menuItems={menuItems}
           footerItems={footerItems}
@@ -163,7 +164,7 @@ export default function SetupProfile() {
         currentName={user.nome}
         currentPixKey={user.chavePix}
         currentPhoto={user.fotoPerfil}
-        currentPhone={user.telefone}
+        currentPhone={maskPhone(user.telefone ?? "")}
         onSave={handleSaveProfile}
       />
     </View>
