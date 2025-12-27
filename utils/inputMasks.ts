@@ -14,6 +14,9 @@ export function maskPhone(value: string): string {
     cleaned = cleaned.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
   }
 
-  // Remove traço ou espaço sobrando no final
-  return cleaned.replace(/[- ]+$/, "");
+  while (cleaned.endsWith("-") || cleaned.endsWith(" ")) {
+    cleaned = cleaned.slice(0, -1);
+  }
+
+  return cleaned;
 }
