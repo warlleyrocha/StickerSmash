@@ -147,7 +147,7 @@ export function SideMenu({
         >
           <SafeAreaView className="flex-1">
             {/* User Header */}
-            <View className="border-b border-gray-100 pb-4 pl-[18px]">
+            <View className="flex-row items-center justify-center gap-3 border-b border-gray-100 px-[40px] py-1 ">
               <View className="mb-3 h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-200">
                 {user.photo ? (
                   <Image
@@ -162,16 +162,18 @@ export function SideMenu({
                 )}
               </View>
 
-              <Text className="text-lg font-semibold">{user.name}</Text>
-              {user.email && (
-                <Text className="text-sm text-gray-500">{user.email}</Text>
-              )}
-              {user.phone && (
-                <Text className="text-sm text-gray-500">{user.phone}</Text>
-              )}
-              {user.pixKey && (
-                <Text className="text-sm text-gray-500">{user.pixKey}</Text>
-              )}
+              <View>
+                <Text className="text-lg font-semibold">{user.name}</Text>
+                {user.email && (
+                  <Text className="text-sm text-gray-500">{user.email}</Text>
+                )}
+                {user.phone && (
+                  <Text className="text-sm text-gray-500">{user.phone}</Text>
+                )}
+                {user.pixKey && (
+                  <Text className="text-sm text-gray-500">{user.pixKey}</Text>
+                )}
+              </View>
             </View>
 
             {/* Menu Items */}
