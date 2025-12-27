@@ -1,5 +1,4 @@
 import LoadingScreen from "@/components/ui/loading-screen";
-import { ONBOARDING_STORAGE_KEY } from "@/constants/storageKeys";
 import { AuthProvider, useAuth } from "@/contexts";
 import {
   Inter_300Light,
@@ -17,10 +16,9 @@ import {
   Mulish_700Bold,
   Mulish_900Black,
 } from "@expo-google-fonts/mulish";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useFonts } from "expo-font";
-import { router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import "../global.css";
@@ -41,27 +39,7 @@ GoogleSignin.configure({
  * Deve estar dentro do AuthProvider para poder usar o useAuth()
  */
 function AppNavigator() {
-  const { user, loading } = useAuth();
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (loading) return;
-
-      if (user) {
-        const onboardingComplete = await AsyncStorage.getItem(
-          ONBOARDING_STORAGE_KEY
-        );
-        if (onboardingComplete === "true") {
-          router.replace("/(userProfile)/profile");
-        } else {
-          router.replace("/onboarding");
-        }
-      } else {
-        router.replace("/(auth)/login");
-      }
-    };
-    checkAuth();
-  }, [user, loading]);
+  const { loading } = useAuth();
 
   // Mostra uma tela de carregamento enquanto verifica a autenticação
   if (loading) {
@@ -73,7 +51,7 @@ function AppNavigator() {
       <Stack.Screen name="index" options={{ headerTitle: "Index" }} />
       <Stack.Screen name="(auth)/login" options={{ headerTitle: "Login" }} />
       <Stack.Screen
-        name="onboarding/index"
+        name="(auth)/onboarding"
         options={{ headerTitle: "Onboarding" }}
       />
       <Stack.Screen
