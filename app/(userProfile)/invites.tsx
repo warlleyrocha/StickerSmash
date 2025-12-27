@@ -12,7 +12,7 @@ import {
 
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 
-import { useSideMenu } from "@/hooks/useSideMenu";
+import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 
 import { useAuth } from "@/contexts";
 
@@ -127,13 +127,13 @@ function InviteCard({ invite, onAccept, onReject }: InviteCardProps) {
 }
 
 export default function Invites() {
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [invites, setInvites] = useState(mockInvites);
 
-  const userName = user?.user?.name ?? "Usuário";
-  const userPhoto = user?.user?.photo;
+  const userName = user?.nome ?? "Usuário";
+  const userPhoto = user?.fotoPerfil;
 
   const handleAcceptInvite = (id: string) => {
     console.log("Aceitar convite:", id);
@@ -149,7 +149,7 @@ export default function Invites() {
 
   const handleSignOut = useCallback(async () => {
     try {
-      await signOut();
+      await logout();
       router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout da conta:", error);
@@ -158,8 +158,7 @@ export default function Invites() {
         "Não foi possível fazer logout da conta. Tente novamente."
       );
     }
-  }, [signOut, router]);
-
+  }, [logout, router]);
   const { menuItems, footerItems } = useSideMenu("invite", handleSignOut);
 
   return (

@@ -10,8 +10,8 @@ import { REPUBLIC_STORAGE_KEY } from "@/constants/storageKeys";
 
 import { useAuth } from "@/contexts";
 
+import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 import { useAsyncStorage } from "@/hooks/useAsyncStorage";
-import { useSideMenu } from "@/hooks/useSideMenu";
 
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
@@ -59,7 +59,7 @@ function RepublicImage({ imageUri, size = 50 }: RepublicImageProps) {
 
 export default function Home() {
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const [tab, setTab] = useState<TabKey>("resumo");
 
   const { data: republica, setData: setRepublica } = useAsyncStorage<Republica>(
@@ -73,7 +73,7 @@ export default function Home() {
 
   const handleSignOut = useCallback(async () => {
     try {
-      await signOut();
+      await logout();
       router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout da conta:", error);
@@ -82,8 +82,7 @@ export default function Home() {
         "Não foi possível fazer logout da conta. Tente novamente."
       );
     }
-  }, [signOut, router]);
-
+  }, [logout, router]);
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut);
 
   const handleSaveRepublica = useCallback(
@@ -95,11 +94,11 @@ export default function Home() {
 
   const userMenu = useMemo(
     () => ({
-      name: user?.user?.name ?? "Usuário",
-      photo: user?.user?.photo,
-      email: user?.user?.email,
+      name: user?.nome ?? "Usuário",
+      photo: user?.fotoPerfil,
+      email: user?.email,
     }),
-    [user?.user?.name, user?.user?.photo, user?.user?.email]
+    [user?.nome, user?.fotoPerfil, user?.email]
   );
 
   const renderHeader = () => (
