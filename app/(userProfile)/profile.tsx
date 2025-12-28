@@ -1,67 +1,44 @@
-import { useAuth } from "@/contexts";
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
-//import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import EmptyRepublic from "@/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/components/CardsProfile/IncompleteProfile";
-//import RepublicList from "@/components/CardsProfile/RepublicList";
 import { EditProfileModal } from "@/components/Modals/EditProfileModal";
-// RepublicCard from "@/components/RepublicCard";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
-import { useSideMenu } from "@/hooks/useSideMenu";
+import { useSideMenu } from "@/components/SideMenu/useSideMenu";
+import { useAuth } from "@/contexts";
+import { maskPhone } from "@/utils/inputMasks";
+import { showToast } from "@/utils/showToast";
+import { toastErrors } from "@/utils/toastMessages";
 
 export default function SetupProfile() {
-  const { user, logout, completeProfile } = useAuth();
   const router = useRouter();
+  const { user, logout, completeProfile, updateUser } = useAuth();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-
-  /* const handleEditRepublic = (id: string) => {
-    console.log("Editar república:", id);
-  };
-
-  const handleSelectRepublic = (id: string) => {
-    console.log("Selecionar república:", id);
-    router.push("/home");
-  };*/
-
-  useEffect(() => {
-    console.log("👤 SetupProfile - User mudou:", {
-      nome: user?.nome,
-      telefone: user?.telefone,
-      chavePix: user?.chavePix,
-      perfilCompleto: user?.perfilCompleto,
-    });
-  }, [user]);
 
   const handleSignOut = useCallback(async () => {
     try {
       await logout();
       router.replace("/");
     } catch (error) {
-      console.error("Erro ao fazer logout:", error);
-      Alert.alert(
-        "Erro no Logout",
-        "Não foi possível fazer logout. Tente novamente."
-      );
+      console.error("❌ Erro ao fazer logout:", error);
+      toastErrors.logoutFailed();
     }
   }, [logout, router]);
 
-  const { menuItems, footerItems } = useSideMenu("profile", handleSignOut);
-
-  // 🆕 Salvar perfil no BACKEND
   const handleSaveProfile = async (
     name: string,
-    email: string,
     pixKey?: string,
     photo?: string,
     phone?: string
   ) => {
-    // Validações
-    if (!phone || !pixKey) {
+    const isCompletingProfile = !user?.perfilCompleto;
+
+    // Validações obrigatórias APENAS ao completar perfil pela primeira vez
+    if (isCompletingProfile && (!phone || !pixKey)) {
       Alert.alert(
         "Campos Obrigatórios",
         "Por favor, preencha o telefone e a chave Pix."
@@ -70,35 +47,43 @@ export default function SetupProfile() {
     }
 
     try {
-      console.log("💾 Salvando perfil...");
+      console.log(
+        isCompletingProfile
+          ? "💾 Completando perfil..."
+          : "💾 Atualizando perfil..."
+      );
 
-      await completeProfile({
-        nome: name,
-        telefone: phone,
-        chavePix: pixKey,
-        fotoPerfil: photo,
-      });
+      if (isCompletingProfile) {
+        await completeProfile({
+          nome: name,
+          telefone: phone!,
+          chavePix: pixKey!,
+          fotoPerfil: photo,
+        });
+      } else {
+        await updateUser({
+          nome: name,
+          telefone: phone,
+          chavePix: pixKey,
+          fotoPerfil: photo,
+        });
+      }
 
-      console.log("✅ Perfil completado com sucesso!");
+      console.log("✅ Perfil salvo com sucesso!");
       console.log("📊 Dados atualizados:", {
-        // 🆕 Debug
         nome: user?.nome,
         telefone: user?.telefone,
         chavePix: user?.chavePix,
       });
-
-      Alert.alert("Sucesso!", "Seu perfil foi completado com sucesso.", [
-        {
-          text: "OK",
-          onPress: () => {
-            setShowEditProfileModal(false);
-            // TODO: Quando tiver repúblicas, redirecionar ou recarregar
-          },
-        },
-      ]);
+      setShowEditProfileModal(false);
+      showToast.success(
+        isCompletingProfile
+          ? "Perfil salvo com sucesso!"
+          : "Perfil atualizado com sucesso!"
+      );
     } catch (error) {
-      // Erro já foi tratado no Context com Alert
-      console.error("Erro ao salvar perfil:", error);
+      console.log("Erro ao salvar o perfil:", error);
+      toastErrors.profileUpdateFailed();
     }
   };
 
@@ -106,7 +91,9 @@ export default function SetupProfile() {
     router.push("/register/republic");
   };
 
-  // 🆕 Se não tem usuário, não renderiza nada (loading do Context)
+  const { menuItems, footerItems } = useSideMenu("profile", handleSignOut);
+
+  // Se não tem usuário, não renderiza nada (loading do Context)
   if (!user) {
     return null;
   }
@@ -162,7 +149,7 @@ export default function SetupProfile() {
             photo: user.fotoPerfil,
             email: user.email,
             pixKey: user.chavePix,
-            phone: user.telefone,
+            phone: maskPhone(user.telefone ?? ""),
           }}
           menuItems={menuItems}
           footerItems={footerItems}
@@ -175,10 +162,9 @@ export default function SetupProfile() {
         visible={showEditProfileModal}
         onClose={() => setShowEditProfileModal(false)}
         currentName={user.nome}
-        currentEmail={user.email}
         currentPixKey={user.chavePix}
         currentPhoto={user.fotoPerfil}
-        currentPhone={user.telefone}
+        currentPhone={maskPhone(user.telefone ?? "")}
         onSave={handleSaveProfile}
       />
     </View>

@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { useRouter } from "expo-router";
 import { MenuItem, UserMenuContext } from "@/types/sideMenu";
+import { useRouter } from "expo-router";
+import { useMemo } from "react";
 
 export function useSideMenu(
   context: UserMenuContext,
@@ -9,7 +9,7 @@ export function useSideMenu(
   const router = useRouter();
 
   const navigation = {
-    home: () => router.push("/home"),
+    home: () => router.push("/"),
     profile: () => router.push("/(userProfile)/profile"),
     invites: () => router.push("/(userProfile)/invites"),
     settings: () => router.push("/(userProfile)/settings"),

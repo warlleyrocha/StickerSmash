@@ -1,24 +1,18 @@
 import { AddAccountModal } from "@/components/Modals/AddAccountModal";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
+import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 import Tabs from "@/components/Tabs";
 import { AccountsTab } from "@/components/Tabs/Accounts";
 import { ResidentsTab } from "@/components/Tabs/Residents";
 import { ResumeTab } from "@/components/Tabs/Resume";
-
-import { REPUBLIC_STORAGE_KEY } from "@/constants/storageKeys";
-
 import { useAuth } from "@/contexts";
-
-import { useAsyncStorage } from "@/hooks/useAsyncStorage";
-import { useSideMenu } from "@/hooks/useSideMenu";
-
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
-
+import { toastErrors } from "@/utils/toastMessages";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 
 const ImageHeader = require("@/assets/images/app-icon/1024.png");
 
@@ -59,13 +53,10 @@ function RepublicImage({ imageUri, size = 50 }: RepublicImageProps) {
 
 export default function Home() {
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
   const [tab, setTab] = useState<TabKey>("resumo");
 
-  const { data: republica, setData: setRepublica } = useAsyncStorage<Republica>(
-    REPUBLIC_STORAGE_KEY,
-    initialRepublica
-  );
+  const [republica, setRepublica] = useState<Republica>(initialRepublica);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -73,33 +64,26 @@ export default function Home() {
 
   const handleSignOut = useCallback(async () => {
     try {
-      await signOut();
+      await logout();
       router.replace("/");
     } catch (error) {
       console.error("Erro ao fazer logout da conta:", error);
-      Alert.alert(
-        "Erro no Logout",
-        "Não foi possível fazer logout da conta. Tente novamente."
-      );
+      toastErrors.logoutFailed();
     }
-  }, [signOut, router]);
-
+  }, [logout, router]);
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut);
 
-  const handleSaveRepublica = useCallback(
-    (nome: string, imagem?: string) => {
-      setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
-    },
-    [setRepublica]
-  );
+  const handleSaveRepublica = (nome: string, imagem?: string) => {
+    setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
+  };
 
   const userMenu = useMemo(
     () => ({
-      name: user?.user?.name ?? "Usuário",
-      photo: user?.user?.photo,
-      email: user?.user?.email,
+      name: user?.nome ?? "Usuário",
+      photo: user?.fotoPerfil,
+      email: user?.email,
     }),
-    [user?.user?.name, user?.user?.photo, user?.user?.email]
+    [user?.nome, user?.fotoPerfil, user?.email]
   );
 
   const renderHeader = () => (
