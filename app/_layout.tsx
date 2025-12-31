@@ -1,8 +1,6 @@
 import LoadingScreen from "@/components/ui/loading-screen";
 import { Toaster } from "@/components/ui/sonner";
-
 import { AuthProvider, useAuth } from "@/contexts";
-
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -69,10 +67,6 @@ function AppNavigator() {
       <Stack.Screen
         name="(userProfile)/register/republic"
         options={{ headerTitle: "Register Republic" }}
-      />
-      <Stack.Screen
-        name="(userProfile)/register/residents"
-        options={{ headerTitle: "Register Residents" }}
       />
       <Stack.Screen
         name="(userProfile)/home"
