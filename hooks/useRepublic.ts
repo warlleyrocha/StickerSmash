@@ -1,4 +1,5 @@
 import { useAuth } from "@/contexts";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -72,8 +73,24 @@ export function useRepublic(): UseRepublicReturn {
                 resident: { name: residentName, phone, pixKey, photo: residentPhoto },
             };
 
-            console.log("Payload enviado:", payload);
+            // Recupera array existente ou inicializa
+            const existing = await AsyncStorage.getItem("republic-data");
+            let republicArray = [];
+            if (existing) {
+                try {
+                    republicArray = JSON.parse(existing);
+                    if (!Array.isArray(republicArray)) republicArray = [];
+                } catch {
+                    republicArray = [];
+                }
+            }
+            republicArray.push(payload);
+            await AsyncStorage.setItem(
+                "republic-data",
+                JSON.stringify(republicArray)
+            );
 
+            console.log("Payload enviado:", payload);
             console.log("República cadastrada com sucesso");
             router.push("/(userProfile)/profile");
         } catch (error) {
