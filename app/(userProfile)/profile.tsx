@@ -72,12 +72,6 @@ export default function SetupProfile() {
         });
       }
 
-      console.log("✅ Perfil salvo com sucesso!");
-      console.log("📊 Dados atualizados:", {
-        nome: user?.nome,
-        telefone: user?.telefone,
-        chavePix: user?.chavePix,
-      });
       setShowEditProfileModal(false);
       showToast.success(
         isCompletingProfile

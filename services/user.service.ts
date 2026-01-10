@@ -3,16 +3,33 @@ import { UpdateUserRequest, User } from "../types/user.types";
 import { api } from "./api";
 
 export const userService = {
+  //Método para buscar dados
+  fetchUser: async (): Promise<User> => {
+    try {
+      const response = await api.get<User>("/usuarios/me");
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        switch (error.response?.status) {
+          case 401:
+            throw new Error("Não Autenticado.");
+          case 500:
+            throw new Error("Erro interno do servidor.");
+          default:
+            throw new Error("Erro ao buscar dados do usuario.");
+        }
+      }
+      throw error;
+    }
+  },
+
   // Método para atualizar dados do usuário
   updateUser: async (data: UpdateUserRequest): Promise<User> => {
-    console.log("📤 Enviando dados atualizados do usuário para o backend...");
     try {
       const response = await api.patch<User>(
-        "/auth/atualizar-dados-perfil",
+        "/usuarios/atualizar-perfil",
         data
       );
-
-      console.log("✅ Dados do usuário atualizados com sucesso.");
 
       return response.data;
     } catch (error) {
