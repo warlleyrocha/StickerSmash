@@ -61,16 +61,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
-        console.log("📋 Usuário carregado do cache:", parsedUser.nome);
       }
 
       // Validar token com o backend
       try {
-        const userData = await authService.me();
-        console.log(
-          "✅ Token válido, dados sincronizados com o servidor:",
-          userData.nome
-        );
+        const userData = await userService.fetchUser();
+        console.log("✅ Token válido. Usuário autenticado");
 
         // Atualizar estado e cache se os dados mudaram
         setUser(userData);
@@ -106,7 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Atualizar estado
         setUser(data.user);
 
-        console.log("✅ Login bem-sucedido:", data.user.email);
+        console.log("✅ Login bem-sucedido");
         return data;
       } catch (err) {
         const errorMessage =
@@ -115,7 +111,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setError(errorMessage);
         return null;
       } finally {
-        console.log("🔵 Finalizando login...");
         setLoading(false);
       }
     },
@@ -146,7 +141,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const completeProfile = React.useCallback(
     async (data: CompleteProfileRequest) => {
       try {
-        console.log("📝 Completando perfil...");
         console.log("📝 Dados enviados:", data);
 
         setLoading(true);
@@ -155,15 +149,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await authService.completeProfile(data);
         console.log("✅ Dados enviados com sucesso");
 
-        // 2️⃣ Buscar dados atualizados (fonte da verdade)
-        console.log("🔄 Buscando dados atualizados do backend...");
         const updatedUser = await authService.me();
-        console.log("✅ Dados sincronizados:", {
-          nome: updatedUser.nome,
-          telefone: updatedUser.telefone,
-          chavePix: updatedUser.chavePix,
-          perfilCompleto: updatedUser.perfilCompleto,
-        });
 
         // 3️⃣ Atualizar Context
         setUser(updatedUser);
@@ -192,13 +178,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Atualizar dados do usuário
   const updateUser = React.useCallback(async (data: UpdateUserRequest) => {
     try {
-      console.log("🔄 Atualizando dados do usuário...", data);
-
       const userData = await userService.updateUser(data);
+      console.log("✅ Usuário atualizado");
       setUser(userData);
       await AsyncStorage.setItem("@app:user", JSON.stringify(userData));
-
-      console.log("✅ Dados atualizados:", userData.nome);
     } catch (error) {
       console.error("❌ Erro ao atualizar usuário:", error);
       throw error;
