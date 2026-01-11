@@ -1,10 +1,7 @@
 import InputField from "@/components/ui/input-field";
 import { Feather } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React from "react";
 import {
-  Alert,
   Dimensions,
   Image,
   ImageBackground,
@@ -16,53 +13,20 @@ import {
   View,
 } from "react-native";
 
+import { useRepublic } from "@/hooks/useRepublic";
+
+const { width, height } = Dimensions.get("window");
+
 export default function Register() {
-  const { width, height } = Dimensions.get("window");
-  const router = useRouter();
-  const [republicName, setRepublicName] = useState("");
-  const [republicImage, setRepublicImage] = useState<string | undefined>(
-    undefined
-  );
+  const {
+    republicName,
+    setRepublicName,
+    republicImage,
+    handleSelectImageRepublic,
+    handlePress,
+  } = useRepublic();
 
-  const selecionarImagemRepublica = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permissão necessária",
-        "Precisamos de permissão para acessar suas fotos!"
-      );
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setRepublicImage(result.assets[0].uri);
-    }
-  };
-
-  const handlePress = async () => {
-    if (!republicName.trim()) {
-      Alert.alert("Erro", "Por favor, informe o nome da república");
-      return;
-    }
-
-    try {
-      console.log("Salvando república...");
-
-      console.log("República salva com sucesso");
-      // Redireciona para a home
-      router.replace("/home");
-    } catch (error) {
-      console.error("Erro ao salvar república:", error);
-      Alert.alert("Erro", "Não foi possível salvar. Tente novamente.");
-    }
-  };
+  const isButtonDisabled = !republicName.trim();
 
   return (
     <KeyboardAvoidingView
@@ -116,7 +80,7 @@ export default function Register() {
           {/* Seleção de Imagem */}
           <View className="mb-6 w-full items-center">
             <TouchableOpacity
-              onPress={selecionarImagemRepublica}
+              onPress={handleSelectImageRepublic}
               className="items-center"
             >
               <View className="h-32 w-32 items-center justify-center rounded-full bg-gray-200">
@@ -151,8 +115,9 @@ export default function Register() {
           <View className="min-h-[20px] flex-1" />
 
           <TouchableOpacity
-            className="w-full rounded-lg bg-indigo-600 px-4 py-3"
+            className={`w-full rounded-lg px-4 py-3 ${isButtonDisabled ? "bg-gray-400" : "bg-indigo-600"}`}
             onPress={handlePress}
+            disabled={isButtonDisabled}
           >
             <Text className="text-center font-inter-medium text-lg text-white">
               Cadastrar

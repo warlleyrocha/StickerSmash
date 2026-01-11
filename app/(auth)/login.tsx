@@ -1,3 +1,6 @@
+import IconGoogle from "@/assets/images/google-icon.svg";
+import { useAuth } from "@/contexts/AuthContext";
+import { showToast } from "@/utils/showToast";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -9,10 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-import { useAuth } from "@/contexts/AuthContext";
-
-import IconGoogle from "@/assets/images/google-icon.svg";
 
 const { height } = Dimensions.get("window");
 
@@ -46,6 +45,7 @@ export default function LoginScreen() {
       router.replace("/");
     } catch (err) {
       console.error("Erro no login:", err);
+      showToast.error("Erro ao fazer login com Google. Tente novamente.");
     } finally {
       setIsSigningIn(false);
     }

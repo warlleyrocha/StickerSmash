@@ -1,16 +1,18 @@
-import { useRouter } from "expo-router";
-import React, { useCallback, useState } from "react";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
-
 import EmptyRepublic from "@/components/CardsProfile/EmptyRepublic";
 import IncompleteProfile from "@/components/CardsProfile/IncompleteProfile";
+import RepublicList from "@/components/CardsProfile/RepublicList";
 import { EditProfileModal } from "@/components/Modals/EditProfileModal";
+import RepublicCard from "@/components/RepublicCard";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 import { useAuth } from "@/contexts";
 import { maskPhone } from "@/utils/inputMasks";
 import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 
 export default function SetupProfile() {
   const router = useRouter();
@@ -18,6 +20,7 @@ export default function SetupProfile() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [republicas, setRepublicas] = useState<any[]>([]);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -69,12 +72,6 @@ export default function SetupProfile() {
         });
       }
 
-      console.log("✅ Perfil salvo com sucesso!");
-      console.log("📊 Dados atualizados:", {
-        nome: user?.nome,
-        telefone: user?.telefone,
-        chavePix: user?.chavePix,
-      });
       setShowEditProfileModal(false);
       showToast.success(
         isCompletingProfile
@@ -92,6 +89,76 @@ export default function SetupProfile() {
   };
 
   const { menuItems, footerItems } = useSideMenu("profile", handleSignOut);
+
+  useEffect(() => {
+    const getRepublicas = async () => {
+      try {
+        const value = await AsyncStorage.getItem("republic-data");
+        if (value) {
+          const arr = JSON.parse(value);
+          if (Array.isArray(arr)) {
+            setRepublicas(arr);
+          } else {
+            setRepublicas([]);
+          }
+        } else {
+          setRepublicas([]);
+        }
+      } catch (e) {
+        console.error("Erro ao buscar repúblicas do AsyncStorage:", e);
+        setRepublicas([]);
+      }
+    };
+    getRepublicas();
+  }, []);
+
+  console.log("📝 Dados da república do AsyncStorage:", republicas);
+
+  // Funções de callback para RepublicList
+  const handleEditRepublic = (id: string) => {
+    // lógica para editar república
+    // Exemplo: navegar para tela de edição
+    router.push("/");
+  };
+  const handleSelectRepublic = (id: string) => {
+    // lógica para selecionar república
+    // Exemplo: navegar para detalhes
+    router.push(`/(userProfile)/(republics)/${id}`);
+  };
+
+  // Mapeia os dados do AsyncStorage para o formato esperado pelo RepublicList
+  const republicasFormatadas = republicas.map((item, idx) => ({
+    id: item.republic?.id || String(idx),
+    nome: item.republic?.name || "Sem nome",
+    imagem: item.republic?.image || null,
+    moradores: 1, // ou ajuste conforme sua lógica
+  }));
+
+  const renderContent = () => {
+    if (!user?.perfilCompleto) {
+      return (
+        <IncompleteProfile onContinue={() => setShowEditProfileModal(true)} />
+      );
+    }
+    if (user.perfilCompleto && republicasFormatadas.length === 0) {
+      return (
+        <EmptyRepublic
+          onCreateRepublic={handleCreateRepublic}
+          onViewInvites={() => router.push("/(userProfile)/invites")}
+        />
+      );
+    }
+    // Exibe lista de repúblicas
+    return (
+      <RepublicList
+        republicas={republicasFormatadas}
+        onEditRepublic={handleEditRepublic}
+        onSelectRepublic={handleSelectRepublic}
+        onCreateRepublic={handleCreateRepublic}
+        RepublicCard={RepublicCard}
+      />
+    );
+  };
 
   // Se não tem usuário, não renderiza nada (loading do Context)
   if (!user) {
@@ -128,16 +195,7 @@ export default function SetupProfile() {
       </View>
 
       {/* CONTENT */}
-      {user.perfilCompleto ? (
-        // 🎯 Perfil completo - mostra mensagem temporária
-        <EmptyRepublic
-          onCreateRepublic={handleCreateRepublic}
-          onViewInvites={() => router.push("/(userProfile)/invites")}
-        />
-      ) : (
-        // 🎯 Perfil incompleto - mostra card para completar
-        <IncompleteProfile onContinue={() => setShowEditProfileModal(true)} />
-      )}
+      {renderContent()}
 
       {/* MENU LATERAL */}
       {isMenuOpen && (
