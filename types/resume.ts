@@ -25,6 +25,7 @@ export type Conta = {
 };
 
 export type Republica = {
+  id: string;
   nome: string;
   imagemRepublica?: string;
   moradores: Morador[];

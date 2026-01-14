@@ -97,7 +97,9 @@ export default function SetupProfile() {
         if (value) {
           const arr = JSON.parse(value);
           if (Array.isArray(arr)) {
-            setRepublicas(arr);
+            // Aceita apenas o novo formato: objeto da república no topo com `id` e `nome`
+            const filtered = arr.filter((it: any) => it?.id && it?.nome);
+            setRepublicas(filtered);
           } else {
             setRepublicas([]);
           }
@@ -126,13 +128,15 @@ export default function SetupProfile() {
     router.push(`/(userProfile)/(republics)/${id}`);
   };
 
-  // Mapeia os dados do AsyncStorage para o formato esperado pelo RepublicList
-  const republicasFormatadas = republicas.map((item, idx) => ({
-    id: item.republic?.id || String(idx),
-    nome: item.republic?.name || "Sem nome",
-    imagem: item.republic?.image || null,
-    moradores: 1, // ou ajuste conforme sua lógica
-  }));
+  // Mapeia os dados do AsyncStorage (novo formato) para o formato esperado pelo RepublicList
+  const republicasFormatadas = republicas
+    .filter((rep: any) => rep?.id && rep?.nome)
+    .map((rep: any, idx: number) => ({
+      id: rep.id ?? String(idx),
+      nome: rep.nome ?? "Sem nome",
+      imagem: rep.imagemRepublica ?? null,
+      moradores: Array.isArray(rep.moradores) ? rep.moradores.length : 1,
+    }));
 
   const renderContent = () => {
     if (!user?.perfilCompleto) {
