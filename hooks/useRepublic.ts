@@ -69,9 +69,8 @@ export function useRepublic(): UseRepublicReturn {
     const handlePress = async () => {
         try {
             console.log("Salvando republica...");
-            // Cria IDs únicos para república e morador inicial
+            // Cria IDs únicos para república
             const republicId = String(uuid.v4());
-            const residentId = String(uuid.v4());
 
             const newRepublic = {
                 id: republicId,
@@ -79,7 +78,7 @@ export function useRepublic(): UseRepublicReturn {
                 imagemRepublica: republicImage,
                 moradores: [
                     {
-                        id: residentId,
+                        id: user?.id ?? "",
                         nome: residentName,
                         fotoPerfil: residentPhoto,
                         telefone: phone,
@@ -102,7 +101,10 @@ export function useRepublic(): UseRepublicReturn {
             }
 
             republicArray.push(newRepublic);
-            await AsyncStorage.setItem("republic-data", JSON.stringify(republicArray));
+            await AsyncStorage.setItem(
+                "republic-data",
+                JSON.stringify(republicArray)
+            );
 
             console.log("República cadastrada com sucesso", newRepublic);
 
