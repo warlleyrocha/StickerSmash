@@ -11,7 +11,11 @@ interface AccountsTabProps {
   readonly onOpenAdd?: () => void;
 }
 
-export function AccountsTab({ republica, setRepublica, onOpenAdd }: AccountsTabProps) {
+export function AccountsTab({
+  republica,
+  setRepublica,
+  onOpenAdd,
+}: AccountsTabProps) {
   const {
     copiadoId,
     expandidaId,
@@ -285,13 +289,13 @@ export function AccountsTab({ republica, setRepublica, onOpenAdd }: AccountsTabP
         <Feather name="dollar-sign" size={48} color="#9ca3af" />
         <Text className="mt-4 text-center text-gray-500">
           Nenhuma conta cadastrada ainda.{"\n"}
-          Clique para adicionar.
+          Toque para adicionar.
         </Text>
       </TouchableOpacity>
     );
   }
 
-  return (  
+  return (
     <ScrollView contentContainerStyle={{ paddingVertical: 12 }}>
       {/* Filtro de Mês */}
       <View className="mb-4 px-4">
@@ -396,14 +400,15 @@ export function AccountsTab({ republica, setRepublica, onOpenAdd }: AccountsTabP
               {mostrarContasPagas && contasOrdenadas.pagas.map(renderContaCard)}
             </View>
           )}
-          
-            <TouchableOpacity className="items-center rounded-md bg-indigo-600 px-4 py-3 mb-2" onPress={() => onOpenAdd?.()}>
-              <Text className="text-white">+ Nova Conta</Text>
-            </TouchableOpacity>
+
+          <TouchableOpacity
+            className="items-center rounded-md bg-indigo-600 px-4 py-3 mb-2"
+            onPress={() => onOpenAdd?.()}
+          >
+            <Text className="text-white">+ Nova Conta</Text>
+          </TouchableOpacity>
         </View>
       )}
-
-    
 
       {/* Modal de Edição */}
       <AddAccountModal
