@@ -2,7 +2,7 @@ import useAddAccount from "@/components/Modals/AddAccountModal/useAccountModal";
 import type { Conta, Republica } from "@/types/resume";
 import { Feather } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import React from "react";
+import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -59,13 +59,18 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
     contaParaEditar,
   });
 
+  const [isValorInputFocused, setIsValorInputFocused] = useState(false);
+
   return (
     <Modal visible={visible} animationType="slide" transparent>
-      <View className="min-h-screen flex-1 justify-center bg-black/40 px-[16px] pt-[100px]">
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <View className="max-h-[100%] rounded-xl bg-white px-6 pt-6">
+      <View className="min-h-screen flex-1 justify-center bg-black/40 px-[16px] pt-[20px]">
+        <KeyboardAvoidingView>
+          <View
+            className="max-h-[100%] rounded-xl bg-white px-6 pt-6"
+            style={{
+              transform: [{ translateY: isValorInputFocused ? -95 : 0 }],
+            }}
+          >
             {/* header */}
             <View className="mb-3 flex-row items-center justify-between">
               <View>
@@ -83,7 +88,10 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
               </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={{ paddingBottom: 16 }}>
+            <ScrollView
+              contentContainerStyle={{ paddingBottom: 16 }}
+              showsVerticalScrollIndicator={false}
+            >
               {/* Descrição */}
               <View className="mb-3">
                 <Text className="mb-1 text-sm text-gray-700">Descrição</Text>
@@ -238,6 +246,8 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                           <TextInput
                             value={valor}
                             editable={checked}
+                            onFocus={() => setIsValorInputFocused(true)}
+                            onBlur={() => setIsValorInputFocused(false)}
                             onChangeText={(t) => setValorMorador(m.id, t)}
                             keyboardType="numeric"
                             className={`rounded px-2 py-1 text-right ${checked ? "border border-gray-200 bg-white" : "bg-gray-100"}`}
