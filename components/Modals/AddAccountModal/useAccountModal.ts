@@ -1,4 +1,5 @@
 // src/hooks/useAddConta.ts
+
 import type { Conta, Republica, Responsavel } from "@/types/resume";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Platform } from "react-native";
@@ -36,6 +37,7 @@ interface UseAddContaParams {
   onClose?: () => void;
   visible?: boolean;
   contaParaEditar?: Conta | null;
+  userLoggedId?: string;
 }
 
 export interface UseAddContaReturn {
@@ -73,6 +75,7 @@ export default function useAddConta({
   onClose,
   visible = false,
   contaParaEditar,
+  userLoggedId,
 }: UseAddContaParams): UseAddContaReturn {
   const [descricao, setDescricao] = useState("");
   const [valorStr, setValorStr] = useState("");
@@ -80,7 +83,7 @@ export default function useAddConta({
   const [showDatepicker, setShowDatepicker] = useState(false);
   const [metodoPagamento, setMetodoPagamento] = useState("PIX");
   const [responsavelId, setResponsavelId] = useState<string | null>(
-    republica.moradores[0]?.id ?? null
+    userLoggedId ?? republica.moradores[0]?.id ?? null
   );
 
   const [tipoDivisao, setTipoDivisao] = useState<"equal" | "custom">("equal");
@@ -124,8 +127,11 @@ export default function useAddConta({
       });
 
       setTipoDivisao(isEqual ? "equal" : "custom");
+    } else if (visible && !contaParaEditar) {
+      // Quando não há conta para editar (modo criação), resetar para o usuário logado
+      setResponsavelId(userLoggedId ?? republica.moradores[0]?.id ?? null);
     }
-  }, [contaParaEditar, visible]);
+  }, [contaParaEditar, visible, userLoggedId, republica.moradores]);
 
   /* Recalcula valores por morador quando necessário.
      Mantém lógica de 'equal' vs 'custom' aqui. */
@@ -179,11 +185,11 @@ export default function useAddConta({
     setValorStr("");
     setVencimento(new Date());
     setMetodoPagamento("PIX");
-    setResponsavelId(republica.moradores[0]?.id ?? null);
+    setResponsavelId(userLoggedId ?? republica.moradores[0]?.id ?? null);
     setTipoDivisao("equal");
     setSelectedIds(republica.moradores.map((m) => m.id));
     setValoresByMorador({});
-  }, [republica.moradores]);
+  }, [republica.moradores, userLoggedId]);
 
   /**
    * salvar: valida, constrói responsaveis, ajusta diferença, atualiza republica.
