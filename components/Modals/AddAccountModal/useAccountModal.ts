@@ -31,6 +31,8 @@ export const computeEqualSplit = (total: number, ids: string[]) => {
   return map;
 };
 
+type TipoDivisao = "equal" | "custom";
+
 interface UseAddContaParams {
   republica: Republica;
   setRepublica: (r: Republica) => void;
@@ -85,8 +87,9 @@ export default function useAddConta({
   const [responsavelId, setResponsavelId] = useState<string | null>(
     userLoggedId ?? republica.moradores[0]?.id ?? null
   );
+  const [edicaoManual, setEdicaoManual] = useState(false);
 
-  const [tipoDivisao, setTipoDivisao] = useState<"equal" | "custom">("equal");
+  const [tipoDivisao, setTipoDivisao] = useState<TipoDivisao>("equal");
   const [selectedIds, setSelectedIds] = useState<string[]>(
     republica.moradores.map((m) => m.id)
   );
@@ -133,8 +136,17 @@ export default function useAddConta({
     }
   }, [contaParaEditar, visible, userLoggedId, republica.moradores]);
 
+  const setValorMorador = useCallback((id: string, val: string) => {
+    setValoresByMorador((prev) => ({ ...prev, [id]: val }));
+
+    // Marcar que houve edição manual
+    setEdicaoManual(true);
+
+    // Se estava em "equal", mudar para "custom"
+    setTipoDivisao("custom");
+  }, []);
   /* Recalcula valores por morador quando necessário.
-     Mantém lógica de 'equal' vs 'custom' aqui. */
+  Mantém lógica de 'equal' vs 'custom' aqui. */
   useEffect(() => {
     if (!visible) return;
 
@@ -144,20 +156,45 @@ export default function useAddConta({
         ? selectedIds
         : republica.moradores.map((m) => m.id);
 
-    if (
-      !Number.isNaN(total) &&
-      total > 0 &&
-      tipoDivisao === "equal" &&
-      ids.length > 0
-    ) {
-      setValoresByMorador(() => computeEqualSplit(total, ids));
-    } else if (tipoDivisao === "custom") {
-      // No modo custom, zerar todos os valores
-      const zeros: Record<string, string> = {};
-      ids.forEach((id) => (zeros[id] = "0.00"));
-      setValoresByMorador(zeros);
+    // Se apenas 1 morador selecionado, mudar para custom automaticamente
+    if (ids.length === 1 && tipoDivisao === "equal") {
+      setTipoDivisao("custom");
+      setEdicaoManual(false); // Reset da flag
     }
-  }, [visible, valorStr, selectedIds, tipoDivisao, republica.moradores]);
+
+    // Se voltar a ter múltiplos moradores e estava em custom (por ter tido 1 só),
+    // voltar para equal
+    if (ids.length > 1 && tipoDivisao === "custom" && !edicaoManual) {
+      setTipoDivisao("equal");
+    }
+
+    if (!edicaoManual) {
+      if (
+        !Number.isNaN(total) &&
+        total > 0 &&
+        tipoDivisao === "equal" &&
+        ids.length > 0
+      ) {
+        setValoresByMorador(() => computeEqualSplit(total, ids));
+      } else if (tipoDivisao === "custom") {
+        // No modo custom, começar com valores divididos igualmente
+        if (!Number.isNaN(total) && total > 0 && ids.length > 0) {
+          setValoresByMorador(() => computeEqualSplit(total, ids));
+        } else {
+          const zeros: Record<string, string> = {};
+          ids.forEach((id) => (zeros[id] = "0.00"));
+          setValoresByMorador(zeros);
+        }
+      }
+    }
+  }, [
+    visible,
+    valorStr,
+    selectedIds,
+    tipoDivisao,
+    republica.moradores,
+    edicaoManual,
+  ]);
 
   const toggleSelectMorador = useCallback((id: string) => {
     setSelectedIds((prev) => {
@@ -165,10 +202,6 @@ export default function useAddConta({
       if (exists) return prev.filter((p) => p !== id);
       return [...prev, id];
     });
-  }, []);
-
-  const setValorMorador = useCallback((id: string, val: string) => {
-    setValoresByMorador((prev) => ({ ...prev, [id]: val }));
   }, []);
 
   const somaResponsaveis = useMemo(
@@ -189,6 +222,7 @@ export default function useAddConta({
     setTipoDivisao("equal");
     setSelectedIds(republica.moradores.map((m) => m.id));
     setValoresByMorador({});
+    setEdicaoManual(false);
   }, [republica.moradores, userLoggedId]);
 
   /**
@@ -291,6 +325,14 @@ export default function useAddConta({
     if (date) setVencimento(date);
   }, []);
 
+  // ✅ Adicionar handler para quando usuário clica nos botões de tipo de divisão
+  const handleSetTipoDivisao = useCallback((tipo: "equal" | "custom") => {
+    setTipoDivisao(tipo);
+    if (tipo === "equal") {
+      setEdicaoManual(false); // Reset quando volta para equal manualmente
+    }
+  }, []);
+
   return {
     descricao,
     setDescricao,
@@ -305,7 +347,7 @@ export default function useAddConta({
     responsavelId,
     setResponsavelId,
     tipoDivisao,
-    setTipoDivisao,
+    setTipoDivisao: handleSetTipoDivisao,
     selectedIds,
     toggleSelectMorador,
     valoresByMorador,
