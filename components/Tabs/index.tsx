@@ -7,13 +7,6 @@ import type { Tab, TabsProps } from "@/types/tabs";
 /* Tabs definidas */
 const tabs: Tab[] = [
   {
-    key: "resumo",
-    label: "Resumo",
-    icon: (color) => (
-      <Ionicons name="stats-chart-outline" size={20} color={color} />
-    ),
-  },
-  {
     key: "contas",
     label: "Contas",
     icon: (color) => (
@@ -24,6 +17,13 @@ const tabs: Tab[] = [
     key: "moradores",
     label: "Moradores",
     icon: (color) => <Ionicons name="people-outline" size={20} color={color} />,
+  },
+  {
+    key: "resumo",
+    label: "Resumo",
+    icon: (color) => (
+      <Ionicons name="stats-chart-outline" size={20} color={color} />
+    ),
   },
 ];
 

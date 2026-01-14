@@ -9,7 +9,9 @@ import { ResumeTab } from "@/components/Tabs/Resume";
 import { useAuth } from "@/contexts";
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
+import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
@@ -54,13 +56,24 @@ function RepublicImage({ imageUri, size = 50 }: RepublicImageProps) {
 export default function Home() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [tab, setTab] = useState<TabKey>("resumo");
+  const [tab, setTab] = useState<TabKey>("contas");
 
   const [republica, setRepublica] = useState<Republica>(initialRepublica);
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  const toggleFavorite = useCallback(() => {
+    setIsFavorited((prev) => {
+      const next = !prev;
+      showToast.success(
+        next ? "República adicionada aos favoritos" : "República removida dos favoritos"
+      );
+      return next;
+    });
+  }, []);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -103,12 +116,18 @@ export default function Home() {
           {republica.moradores?.length || 0} moradores
         </Text>
       </TouchableOpacity>
-
+      
       <TouchableOpacity
-        onPress={() => setShowAddModal(true)}
-        className="self-center rounded-md bg-indigo-600 px-4 py-2"
+        onPress={toggleFavorite}
+        className="items-center justify-center rounded-full p-2 mb-2"
+        accessibilityRole="button"
+        accessibilityLabel={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
       >
-        <Text className="text-white">+ Nova Conta</Text>
+        <MaterialCommunityIcons
+          name={isFavorited ? "star" : "star-outline"}
+          size={22}
+          color={isFavorited ? "#f59e0b" : "#6b7280"}
+        />
       </TouchableOpacity>
 
       <MenuButton onPress={() => setIsMenuOpen(true)} />
@@ -117,16 +136,20 @@ export default function Home() {
 
   const renderTabContent = () => {
     switch (tab) {
-      case "resumo":
-        return <ResumeTab republica={republica} />;
       case "contas":
         return (
-          <AccountsTab republica={republica} setRepublica={setRepublica} />
+          <AccountsTab
+            republica={republica}
+            setRepublica={setRepublica}
+            onOpenAdd={() => setShowAddModal(true)}
+          />
         );
       case "moradores":
         return (
           <ResidentsTab republica={republica} setRepublica={setRepublica} />
         );
+      case "resumo":
+        return <ResumeTab republica={republica} />;
       default:
         return null;
     }
