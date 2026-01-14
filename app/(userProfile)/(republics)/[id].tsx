@@ -12,13 +12,14 @@ import type { TabKey } from "@/types/tabs";
 import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 const ImageHeader = require("@/assets/images/app-icon/1024.png");
 
 const initialRepublica: Republica = {
+  id: "",
   nome: "",
   moradores: [],
   contas: [],
@@ -56,6 +57,11 @@ function RepublicImage({ imageUri, size = 50 }: RepublicImageProps) {
 export default function Home() {
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { id: idParam } = useLocalSearchParams<{ id?: string }>();
+
+  // Debug: console.log as a quick check while testing
+  // console.log('Route param id:', idParam);
+
   const [tab, setTab] = useState<TabKey>("contas");
 
   const [republica, setRepublica] = useState<Republica>(initialRepublica);
@@ -64,6 +70,28 @@ export default function Home() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
+
+  // Carrega a república por id quando a tela for aberta
+  React.useEffect(() => {
+    (async () => {
+      try {
+        if (!idParam) return;
+        const existing = await (await import('@react-native-async-storage/async-storage')).default.getItem('republic-data');
+        if (!existing) return;
+        const republicArray = JSON.parse(existing);
+        const found = republicArray.find((r: any) => r.id === idParam);
+        if (found) {
+          setRepublica(found);
+        } else {
+          showToast.error('República não encontrada');
+          router.back();
+        }
+      } catch (err) {
+        console.error('Erro ao carregar república:', err);
+        showToast.error('Erro ao carregar república');
+      }
+    })();
+  }, [idParam, router]);
 
   const toggleFavorite = useCallback(() => {
     setIsFavorited((prev) => {

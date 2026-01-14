@@ -4,6 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
+import uuid from "react-native-uuid";
 
 type UseRepublicState = {
     republicName: string;
@@ -68,14 +69,29 @@ export function useRepublic(): UseRepublicReturn {
     const handlePress = async () => {
         try {
             console.log("Salvando republica...");
-            const payload = {
-                republic: { name: republicName, image: republicImage },
-                resident: { name: residentName, phone, pixKey, photo: residentPhoto },
+            // Cria IDs únicos para república e morador inicial
+            const republicId = String(uuid.v4());
+            const residentId = String(uuid.v4());
+
+            const newRepublic = {
+                id: republicId,
+                nome: republicName,
+                imagemRepublica: republicImage,
+                moradores: [
+                    {
+                        id: residentId,
+                        nome: residentName,
+                        fotoPerfil: residentPhoto,
+                        telefone: phone,
+                        chavePix: pixKey,
+                    },
+                ],
+                contas: [],
             };
 
             // Recupera array existente ou inicializa
             const existing = await AsyncStorage.getItem("republic-data");
-            let republicArray = [];
+            let republicArray: any[] = [];
             if (existing) {
                 try {
                     republicArray = JSON.parse(existing);
@@ -84,15 +100,14 @@ export function useRepublic(): UseRepublicReturn {
                     republicArray = [];
                 }
             }
-            republicArray.push(payload);
-            await AsyncStorage.setItem(
-                "republic-data",
-                JSON.stringify(republicArray)
-            );
 
-            console.log("Payload enviado:", payload);
-            console.log("República cadastrada com sucesso");
-            router.push("/(userProfile)/profile");
+            republicArray.push(newRepublic);
+            await AsyncStorage.setItem("republic-data", JSON.stringify(republicArray));
+
+            console.log("República cadastrada com sucesso", newRepublic);
+
+            // Navega para a página da república criada
+            router.push(`/(userProfile)/(republics)/${republicId}`);
         } catch (error) {
             console.error("Erro ao salvar republica:", error);
             Alert.alert(
@@ -100,6 +115,11 @@ export function useRepublic(): UseRepublicReturn {
                 "Não foi possível salvar a república. Tente novamente."
             );
         }
+    };
+
+    // Wrapper para setRepublicImage
+    const setRepublicImageWrapper = (uri?: string) => {
+        setRepublicImage(uri ?? "");
     };
 
     return {
@@ -112,7 +132,7 @@ export function useRepublic(): UseRepublicReturn {
         phone,
         // Funções para atualizar os estados
         setRepublicName,
-        setRepublicImage,
+        setRepublicImage: setRepublicImageWrapper,
         handleSelectImageRepublic,
         setResidentName,
         setResidentPhoto,
