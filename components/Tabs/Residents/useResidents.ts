@@ -1,4 +1,5 @@
 import type { Morador, Republica } from "@/types/resume";
+import { showToast } from "@/utils/showToast";
 import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -36,13 +37,13 @@ export const useResidents = ({
 
   const copiarChavePix = async (morador: Morador) => {
     if (!morador.chavePix) {
-      Alert.alert("Erro", "Morador não possui chave PIX cadastrada.");
+      showToast.error("Morador não possui chave PIX cadastrada.");
       return;
     }
 
     await Clipboard.setStringAsync(morador.chavePix);
     setCopiadoId(morador.id);
-    Alert.alert("Copiado", "Chave PIX copiada para a área de transferência.");
+    showToast.info("Chave copiada para a área de transferência.");
     setTimeout(() => setCopiadoId(null), 1500);
   };
 
@@ -75,7 +76,7 @@ export const useResidents = ({
 
   const salvarEdicaoMorador = () => {
     if (!editForm.nome.trim()) {
-      Alert.alert("Erro", "Informe o nome do morador.");
+      showToast.error("Informe o nome do morador.");
       return;
     }
 
@@ -86,15 +87,15 @@ export const useResidents = ({
         moradores: republica.moradores.map((m) =>
           m.id === moradorParaEditar.id
             ? {
-                ...m,
-                nome: editForm.nome.trim(),
-                chavePix: editForm.chavePix?.trim() || undefined,
-                fotoPerfil: editForm.fotoPerfil,
-              }
+              ...m,
+              nome: editForm.nome.trim(),
+              chavePix: editForm.chavePix?.trim() || undefined,
+              fotoPerfil: editForm.fotoPerfil,
+            }
             : m
         ),
       });
-      Alert.alert("Sucesso", "Morador atualizado com sucesso!");
+      showToast.success("Morador atualizado com sucesso!");
     } else {
       // Adicionar novo morador
       const novo: Morador = {
@@ -107,7 +108,7 @@ export const useResidents = ({
         ...republica,
         moradores: [...republica.moradores, novo],
       });
-      Alert.alert("Sucesso", "Morador adicionado com sucesso!");
+      showToast.success("Morador adicionado com sucesso!");
     }
 
     setShowEditModal(false);
@@ -124,10 +125,7 @@ export const useResidents = ({
   const selecionarImagem = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Permissão necessária",
-        "Precisamos de permissão para acessar suas fotos!"
-      );
+      showToast.error("Precisamos de permissão para acessar suas fotos!");
       return;
     }
 

@@ -110,7 +110,7 @@ const RootLayout = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <AppNavigator />
-        <Toaster position="top-center" />
+        <Toaster position="bottom-center" />
       </AuthProvider>
     </GestureHandlerRootView>
   );
