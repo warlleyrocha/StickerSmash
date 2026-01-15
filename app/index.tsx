@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts";
 import { Redirect } from "expo-router";
 
 export default function Index() {
-  const { user, loading } = useAuth();
+  const { user, loading, republicData } = useAuth();
   // Mostra loading enquanto verifica autenticação e dados
   if (loading) {
     return <LoadingScreen message="Carregando..." />;
@@ -16,6 +16,19 @@ export default function Index() {
 
   if (!user.perfilCompleto) {
     return <Redirect href="/(auth)/onboarding" />;
+  }
+
+  // Já participa de uma república
+  if (republicData && Array.isArray(republicData) && republicData.length > 0) {
+    const rep = republicData[0];
+    return (
+      <Redirect
+        href={{
+          pathname: "/(userProfile)/(republics)/[id]",
+          params: { id: rep.id },
+        }}
+      />
+    );
   }
 
   return <Redirect href="/(userProfile)/profile" />;
