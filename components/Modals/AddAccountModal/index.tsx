@@ -68,7 +68,7 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
           <View
             className="max-h-[100%] rounded-xl bg-white px-6 pt-6"
             style={{
-              transform: [{ translateY: isValorInputFocused ? -95 : 0 }],
+              transform: [{ translateY: isValorInputFocused ? -135 : 0 }],
             }}
           >
             {/* header */}
