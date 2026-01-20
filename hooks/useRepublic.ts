@@ -1,18 +1,24 @@
 import { republicService } from "@/services/republic.service";
-import type { RepublicPost } from "@/types/republic.types";
+import type { RepublicPost, RepublicResponse } from "@/types/republic.types";
+import { showToast } from "@/utils/showToast";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Alert } from "react-native";
 
 type UseRepublicState = {
   republicName: string;
   republicImage?: string;
+  republics: RepublicResponse[];
 };
 
 type UseRepublicActions = {
   setRepublicName: (name: string) => void;
   setRepublicImage: (uri?: string) => void;
+  setRepublics: (republics: RepublicResponse[]) => void;
+  fetchRepublics: () => Promise<void>;
+  fetchRepublicById: (id: string) => Promise<RepublicResponse | null>;
+  updatedRepublic: (id: string, data: RepublicPost) => Promise<boolean>;
   handleSelectImageRepublic: () => Promise<void>;
   handlePress: () => Promise<void>;
 };
@@ -22,6 +28,7 @@ type UseRepublicReturn = UseRepublicState & UseRepublicActions;
 export function useRepublic(): UseRepublicReturn {
   const router = useRouter();
 
+  const [republics, setRepublics] = useState<RepublicResponse[]>([]);
   const [republicName, setRepublicName] = useState("");
   const [republicImage, setRepublicImage] = useState<string | undefined>(
     undefined
@@ -73,6 +80,62 @@ export function useRepublic(): UseRepublicReturn {
     }
   };
 
+  // Função para buscar repúblicas
+  const fetchRepublics = useCallback(async () => {
+    try {
+      const data = await republicService.getRepublics();
+      setRepublics(data);
+    } catch (error) {
+      console.error("Erro ao buscar repúblicas:", error);
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar as repúblicas. Tente novamente."
+      );
+      setRepublics([]);
+    } finally {
+      console.log("Busca de repúblicas finalizada.");
+    }
+  }, []);
+
+  // Função para buscar repúblicas por ID
+  const fetchRepublicById = useCallback(async (id: string) => {
+    try {
+      const republic = await republicService.getRepublicById(id);
+      return republic;
+    } catch (error) {
+      console.error("Erro ao buscar república por ID:", error);
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar a república. Tente novamente."
+      );
+      return null;
+    }
+  }, []);
+
+  // Função para atualizar república
+  const updateRepublic = useCallback(
+    async (id: string, data: RepublicPost): Promise<boolean> => {
+      try {
+        await republicService.updateRepublic(id, data);
+        console.log("República atualizada:", data.nome, data.imagemRepublica);
+
+        // Atualizar a lista de repúblicas após a atualização
+        const updatedRepublics = republics.map((r) =>
+          r.id === id ? { ...r, ...data } : r
+        );
+        setRepublics(updatedRepublics);
+
+        showToast.success("República atualizada com sucesso");
+        return true;
+      } catch (error) {
+        console.error("Erro ao atualizar república:", error);
+        showToast.error("Erro ao atualizar república");
+        return false;
+      }
+    },
+    [republics]
+  );
+
   // Wrapper para setRepublicImage
   const setRepublicImageWrapper = (uri?: string) => {
     setRepublicImage(uri ?? "");
@@ -82,13 +145,16 @@ export function useRepublic(): UseRepublicReturn {
     // Estados dos dados da república
     republicName,
     republicImage,
-
-    // Funções para atualizar os estados
+    republics, // Funções para atualizar os estados
     setRepublicName,
     setRepublicImage: setRepublicImageWrapper,
     handleSelectImageRepublic,
+    setRepublics,
 
     // Funções de ação
     handlePress,
+    fetchRepublics,
+    fetchRepublicById,
+    updatedRepublic: updateRepublic,
   };
 }

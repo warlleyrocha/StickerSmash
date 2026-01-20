@@ -1,4 +1,4 @@
-import { AddAccountModal } from "@/components/Modals/AddAccountModal";
+import AddAccountModal from "@/components/Modals/AddAccountModal";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
@@ -7,15 +7,21 @@ import { AccountsTab } from "@/components/Tabs/Accounts";
 import { ResidentsTab } from "@/components/Tabs/Residents";
 import { ResumeTab } from "@/components/Tabs/Resume";
 import { useAuth } from "@/contexts";
+import { useRepublic } from "@/hooks/useRepublic";
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
 import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const ImageHeader = require("@/assets/images/app-icon/1024.png");
 
@@ -59,6 +65,7 @@ export default function Home() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { id: idParam } = useLocalSearchParams<{ id?: string }>();
+  const { fetchRepublicById, updatedRepublic } = useRepublic();
 
   // Debug: console.log as a quick check while testing
   // console.log('Route param id:', idParam);
@@ -71,20 +78,30 @@ export default function Home() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Carrega a república por id quando a tela for aberta
-  React.useEffect(() => {
-    (async () => {
+  useEffect(() => {
+    async function loadRepublic() {
+      if (!idParam) {
+        showToast.error("ID da república não encontrado");
+        router.back();
+        return;
+      }
+
+      setIsLoading(true);
       try {
-        if (!idParam) return;
-        const existing = await (
-          await import("@react-native-async-storage/async-storage")
-        ).default.getItem("republic-data");
-        if (!existing) return;
-        const republicArray = JSON.parse(existing);
-        const found = republicArray.find((r: any) => r.id === idParam);
-        if (found) {
-          setRepublica(found);
+        const republicData = await fetchRepublicById(idParam);
+
+        if (republicData) {
+          // Mapear RepublicResponse para Republica (se necessário)
+          setRepublica({
+            id: republicData.id,
+            nome: republicData.nome,
+            imagemRepublica: republicData.imagemRepublica,
+            moradores: republicData.moradores || [],
+            contas: republicData.contas || [],
+          });
+          console.log("República carregada:", republicData);
         } else {
           showToast.error("República não encontrada");
           router.back();
@@ -92,9 +109,14 @@ export default function Home() {
       } catch (err) {
         console.error("Erro ao carregar república:", err);
         showToast.error("Erro ao carregar república");
+        router.back();
+      } finally {
+        setIsLoading(false);
       }
-    })();
-  }, [idParam, router]);
+    }
+
+    loadRepublic();
+  }, [idParam, fetchRepublicById, router]);
 
   const toggleFavorite = useCallback(() => {
     setIsFavorited((prev) => {
@@ -119,42 +141,17 @@ export default function Home() {
   }, [logout, router]);
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut);
 
-  const handleSaveRepublica = (nome: string, imagem?: string) => {
-    setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
+  const handleSaveRepublica = async (nome: string, imagem?: string) => {
+    const success = await updatedRepublic(republica.id, {
+      nome,
+      imagemRepublica: imagem,
+    });
+
+    // Atualizar estado local apenas se a API teve sucesso
+    if (success) {
+      setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
+    }
   };
-
-  // Persiste alterações da república no AsyncStorage sempre que 'republica' mudar
-  useEffect(() => {
-    (async () => {
-      try {
-        if (!republica?.id) return;
-        const existing = await AsyncStorage.getItem("republic-data");
-        let republicArray: any[] = [];
-        if (existing) {
-          try {
-            republicArray = JSON.parse(existing);
-            if (!Array.isArray(republicArray)) republicArray = [];
-          } catch {
-            republicArray = [];
-          }
-        }
-
-        const idx = republicArray.findIndex((r: any) => r.id === republica.id);
-        if (idx >= 0) {
-          republicArray[idx] = republica;
-        } else {
-          republicArray.push(republica);
-        }
-
-        await AsyncStorage.setItem(
-          "republic-data",
-          JSON.stringify(republicArray)
-        );
-      } catch (err) {
-        console.error("Erro ao persistir república:", err);
-      }
-    })();
-  }, [republica]);
 
   const userMenu = useMemo(
     () => ({
@@ -222,6 +219,15 @@ export default function Home() {
         return null;
     }
   };
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-[#FAFAFA] items-center justify-center">
+        <ActivityIndicator size="large" color="#000" />
+        <Text className="mt-4 text-gray-600">Carregando república...</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">

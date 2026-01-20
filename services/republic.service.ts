@@ -49,4 +49,57 @@ export const republicService = {
       throw error;
     }
   },
+
+  // Método para obter detalhes de uma república específica
+  getRepublicById: async (id: string): Promise<RepublicResponse> => {
+    try {
+      const response = await api.get<RepublicResponse>(`/republicas/${id}`);
+
+      console.log("📦 Resposta da API:", response.data);
+
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        switch (error.response?.status) {
+          case 400:
+            throw new Error("Requisição inválida.");
+          case 401:
+            throw new Error("Não autenticado.");
+          case 500:
+            throw new Error("Erro interno do servidor.");
+          default:
+            throw new Error("Erro ao obter detalhes da república.");
+        }
+      }
+      throw error;
+    }
+  },
+
+  // Método para atualizar uma república
+  updateRepublic: async (
+    id: string,
+    data: Partial<RepublicPost>
+  ): Promise<RepublicResponse> => {
+    try {
+      const response = await api.patch<RepublicResponse>(
+        `/republicas/${id}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        switch (error.response?.status) {
+          case 400:
+            throw new Error("Requisição inválida.");
+          case 401:
+            throw new Error("Não autenticado.");
+          case 500:
+            throw new Error("Erro interno do servidor.");
+          default:
+            throw new Error("Erro ao atualizar república.");
+        }
+      }
+      throw error;
+    }
+  },
 };
