@@ -119,13 +119,45 @@ export const AddAccountModal: React.FC<AddAccountModalProps> = ({
                     <Text>{vencimento.toLocaleDateString("pt-BR")}</Text>
                     <Feather name="calendar" size={18} color="#6b7280" />
                   </TouchableOpacity>
-                  {showDatepicker && (
-                    <DateTimePicker
-                      value={vencimento}
-                      mode="date"
-                      display={Platform.OS === "ios" ? "spinner" : "calendar"}
-                      onChange={handleDateChange}
-                    />
+                  {Platform.OS === 'ios' ? (
+                    <Modal
+                      visible={showDatepicker}
+                      transparent
+                      animationType="slide"
+                    >
+                      <View className="flex-1 justify-end bg-black/40">
+                        <View className="bg-white pb-8 pt-4">
+                          <View className="mb-2 flex-row justify-end px-4">
+                            <TouchableOpacity onPress={() => setShowDatepicker(false)}>
+                              <Text className="text-base font-semibold text-indigo-600">
+                                Confirmar
+                              </Text>
+                            </TouchableOpacity>
+                          </View>
+
+                          <View className="items-center">
+                            <DateTimePicker
+                            value={vencimento}
+                            mode="date"
+                            display="spinner"
+                            onChange={handleDateChange}
+                            locale="pt-BR"
+                          />
+                          </View>
+                          
+
+                        </View>
+                      </View>
+                    </Modal>
+                  ) : (
+                    showDatepicker && (
+                      <DateTimePicker
+                        value={vencimento}
+                        mode="date"
+                        display="calendar"
+                        onChange={handleDateChange}
+                      />
+                    )
                   )}
                 </View>
               </View>
