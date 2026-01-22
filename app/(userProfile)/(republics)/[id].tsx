@@ -65,17 +65,18 @@ export default function Home() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { id: idParam } = useLocalSearchParams<{ id?: string }>();
-  const { fetchRepublicById, updatedRepublic } = useRepublic();
-
-  // Debug: console.log as a quick check while testing
-  // console.log('Route param id:', idParam);
+  const {
+    fetchRepublicById,
+    updatedRepublic,
+    showEditModal,
+    setShowEditModal,
+  } = useRepublic();
 
   const [tab, setTab] = useState<TabKey>("contas");
 
   const [republica, setRepublica] = useState<Republica>(initialRepublica);
 
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
