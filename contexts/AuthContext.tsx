@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   // Logout
@@ -151,7 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await authService.completeProfile(data);
         console.log("✅ Dados enviados com sucesso");
 
-        const updatedUser = await authService.me();
+        const updatedUser = await userService.fetchUser();
 
         // 3️⃣ Atualizar Context
         setUser(updatedUser);
@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   // Atualizar dados do usuário
@@ -224,7 +224,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       logout,
       updateUser,
       completeProfile,
-    ]
+    ],
   );
 
   return (
