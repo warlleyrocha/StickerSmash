@@ -6,13 +6,18 @@ import Tabs from "@/components/Tabs";
 import { AccountsTab } from "@/components/Tabs/Accounts";
 import { ResidentsTab } from "@/components/Tabs/Residents";
 import { ResumeTab } from "@/components/Tabs/Resume";
+
 import { useAuth } from "@/contexts";
+
 import { useRepublic } from "@/hooks/useRepublic";
+
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
+
 import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -23,43 +28,12 @@ import {
   View,
 } from "react-native";
 
-const ImageHeader = require("@/assets/images/app-icon/1024.png");
-
 const initialRepublica: Republica = {
   id: "",
   nome: "",
   moradores: [],
   contas: [],
 };
-
-interface RepublicImageProps {
-  readonly imageUri?: string;
-  readonly size?: number;
-}
-
-function RepublicImage({ imageUri, size = 50 }: RepublicImageProps) {
-  const imageStyle = {
-    width: size,
-    height: size,
-    borderRadius: size / 2,
-  };
-
-  if (imageUri) {
-    return (
-      <Image
-        source={{ uri: imageUri }}
-        style={{ ...imageStyle, resizeMode: "cover" }}
-      />
-    );
-  }
-
-  return (
-    <Image
-      source={ImageHeader}
-      style={{ ...imageStyle, resizeMode: "cover" }}
-    />
-  );
-}
 
 export default function Home() {
   const router = useRouter();
@@ -166,7 +140,14 @@ export default function Home() {
   const renderHeader = () => (
     <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
       <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-black">
-        <RepublicImage imageUri={republica.imagemRepublica} />
+        {republica.imagemRepublica ? (
+          <Image
+            source={{ uri: republica.imagemRepublica }}
+            className="h-32 w-32 rounded-full"
+          />
+        ) : (
+          <Feather name="image" size={48} color="#6b7280" />
+        )}
       </View>
 
       <TouchableOpacity
