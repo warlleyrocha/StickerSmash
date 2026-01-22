@@ -30,25 +30,6 @@ export function useAccounts({ republica, setRepublica }: UseAccountsProps) {
       .reverse();
   }, [republica.contas]);
 
-  const formatarMesAno = (mesAno: string) => {
-    const [ano, mes] = mesAno.split("-");
-    const meses = [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
-    ];
-    return `${meses[Number.parseInt(mes) - 1]} ${ano}`;
-  };
-
   const marcarComoPago = (contaId: string) => {
     setRepublica({
       ...republica,
@@ -170,7 +151,6 @@ export function useAccounts({ republica, setRepublica }: UseAccountsProps) {
     setMostrarContasPagas,
     mostrarContasAbertas,
     setMostrarContasAbertas,
-    formatarMesAno,
     marcarComoPago,
     marcarResponsavelComoPago,
     copiarChavePix,

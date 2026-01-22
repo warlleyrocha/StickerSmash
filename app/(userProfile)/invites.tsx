@@ -8,6 +8,7 @@ import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 
 import { useAuth } from "@/contexts";
+import { formatDate } from "@/utils/formats";
 import { toastErrors } from "@/utils/toastMessages";
 
 // Mock de convites recebidos
@@ -45,14 +46,6 @@ interface InviteCardProps {
 }
 
 function InviteCard({ invite, onAccept, onReject }: InviteCardProps) {
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "short",
-    });
-  };
-
   return (
     <View className="mb-4 overflow-hidden rounded-2xl bg-white shadow-sm">
       {/* Header do Card com Imagem */}

@@ -1,5 +1,6 @@
 import { DeleteButton } from "@/components/ui/delete-button";
 import type { Conta, Republica } from "@/types/resume";
+import { formatMounthYear } from "@/utils/formats";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { AddAccountModal } from "../../Modals/AddAccountModal";
@@ -30,7 +31,6 @@ export function AccountsTab({
     setMostrarContasPagas,
     mostrarContasAbertas,
     setMostrarContasAbertas,
-    formatarMesAno,
     marcarComoPago,
     marcarResponsavelComoPago,
     copiarChavePix,
@@ -339,7 +339,7 @@ export function AccountsTab({
                   mesSelecionado === mesAno ? "text-white" : "text-gray-700"
                 }`}
               >
-                {formatarMesAno(mesAno)}
+                {formatMounthYear(mesAno)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -353,7 +353,7 @@ export function AccountsTab({
         <View className="mx-4 mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
           <Feather name="calendar" size={48} color="#9ca3af" />
           <Text className="mt-4 text-center text-gray-500">
-            Nenhuma conta encontrada para {formatarMesAno(mesSelecionado)}.
+            Nenhuma conta encontrada para {formatMounthYear(mesSelecionado)}.
           </Text>
         </View>
       ) : (
