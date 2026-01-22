@@ -99,8 +99,8 @@ export default function Home() {
             id: republicData.id,
             nome: republicData.nome,
             imagemRepublica: republicData.imagemRepublica,
-            moradores: republicData.moradores || [],
-            contas: republicData.contas || [],
+            moradores: [],
+            contas: [],
           });
           console.log("República carregada:", republicData);
         } else {
