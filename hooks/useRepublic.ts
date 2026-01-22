@@ -10,15 +10,18 @@ type UseRepublicState = {
   republicName: string;
   republicImage?: string;
   republics: RepublicResponse[];
+  showEditModal: boolean;
 };
 
 type UseRepublicActions = {
   setRepublicName: (name: string) => void;
   setRepublicImage: (uri?: string) => void;
   setRepublics: (republics: RepublicResponse[]) => void;
+  setShowEditModal: (visible: boolean) => void;
   fetchRepublics: () => Promise<void>;
   fetchRepublicById: (id: string) => Promise<RepublicResponse | null>;
   updatedRepublic: (id: string, data: RepublicPost) => Promise<boolean>;
+  deleteRepublic?: (id: string) => Promise<boolean>;
   handleSelectImageRepublic: () => Promise<void>;
   handlePress: () => Promise<void>;
 };
@@ -33,6 +36,7 @@ export function useRepublic(): UseRepublicReturn {
   const [republicImage, setRepublicImage] = useState<string | undefined>(
     undefined
   );
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const handleSelectImageRepublic = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -136,6 +140,28 @@ export function useRepublic(): UseRepublicReturn {
     [republics]
   );
 
+  // Função para deletar república
+  const deleteRepublic = useCallback(
+    async (id: string): Promise<boolean> => {
+      try {
+        await republicService.deleteRepublic(id);
+        console.log("República deletada:", id);
+
+        // Atualizar a lista de repúblicas após a deleção
+        const updatedRepublics = republics.filter((r) => r.id !== id);
+        setRepublics(updatedRepublics);
+
+        showToast.success("República deletada com sucesso");
+        return true;
+      } catch (error) {
+        console.error("Erro ao deletar república:", error);
+        showToast.error("Erro ao deletar república");
+        return false;
+      }
+    },
+    [republics]
+  );
+
   // Wrapper para setRepublicImage
   const setRepublicImageWrapper = (uri?: string) => {
     setRepublicImage(uri ?? "");
@@ -145,16 +171,21 @@ export function useRepublic(): UseRepublicReturn {
     // Estados dos dados da república
     republicName,
     republicImage,
-    republics, // Funções para atualizar os estados
+    republics,
+    showEditModal,
+
+    // Funções para atualizar os estados
     setRepublicName,
     setRepublicImage: setRepublicImageWrapper,
     handleSelectImageRepublic,
     setRepublics,
+    setShowEditModal,
 
     // Funções de ação
     handlePress,
     fetchRepublics,
     fetchRepublicById,
     updatedRepublic: updateRepublic,
+    deleteRepublic,
   };
 }

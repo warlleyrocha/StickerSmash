@@ -102,4 +102,25 @@ export const republicService = {
       throw error;
     }
   },
+
+  // Método para deletar uma república
+  deleteRepublic: async (id: string): Promise<void> => {
+    try {
+      await api.delete(`/republicas/${id}`);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        switch (error.response?.status) {
+          case 400:
+            throw new Error("Requisição inválida.");
+          case 401:
+            throw new Error("Não autenticado.");
+          case 500:
+            throw new Error("Erro interno do servidor.");
+          default:
+            throw new Error("Erro ao deletar república.");
+        }
+      }
+      throw error;
+    }
+  },
 };
