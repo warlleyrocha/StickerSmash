@@ -1,5 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  RefreshControl,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface Republica {
   readonly id: string;
@@ -18,6 +24,8 @@ interface RepublicListProps {
     onEdit: () => void;
     onSelect: () => void;
   }>;
+  readonly refreshing?: boolean;
+  readonly onRefresh?: () => void | Promise<void>;
 }
 
 export default function RepublicList({
@@ -26,9 +34,23 @@ export default function RepublicList({
   onSelectRepublic,
   onCreateRepublic,
   RepublicCard,
+  refreshing = false,
+  onRefresh,
 }: RepublicListProps) {
   return (
-    <ScrollView className="flex-1 px-6 pt-6">
+    <ScrollView
+      className="flex-1 px-6 pt-6"
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#6366F1"]} // Cor do loading (Android)
+            tintColor="#6366F1" // Cor do loading (iOS)
+          />
+        ) : undefined
+      }
+    >
       <Text className="mb-4 text-lg font-semibold text-gray-800">
         Suas Repúblicas
       </Text>

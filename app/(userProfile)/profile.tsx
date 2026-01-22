@@ -21,6 +21,7 @@ export default function SetupProfile() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -92,9 +93,15 @@ export default function SetupProfile() {
 
   useEffect(() => {
     fetchRepublics();
-  }, []);
+  }, [fetchRepublics]);
 
   console.log("📝 Dados da república do DB:", republics);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchRepublics();
+    setRefreshing(false);
+  }, [fetchRepublics]);
 
   // Funções de callback para RepublicList
   const handleEditRepublic = (id: string) => {
@@ -141,6 +148,8 @@ export default function SetupProfile() {
         onSelectRepublic={handleSelectRepublic}
         onCreateRepublic={handleCreateRepublic}
         RepublicCard={RepublicCard}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
     );
   };
