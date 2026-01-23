@@ -143,7 +143,7 @@ export default function Home() {
         {republica.imagemRepublica ? (
           <Image
             source={{ uri: republica.imagemRepublica }}
-            className="h-32 w-32 rounded-full"
+            className="h-[50px] w-[50px] rounded-full"
           />
         ) : (
           <Feather name="image" size={48} color="#6b7280" />
