@@ -7,15 +7,15 @@ import { useState } from "react";
 import { Alert } from "react-native";
 import uuid from "react-native-uuid";
 
-interface UseResidentsProps {
+interface UseTabResidentsProps {
   republica: Republica;
   setRepublica: (rep: Republica) => void;
 }
 
-export const useResidents = ({
+export const useTabResidents = ({
   republica,
   setRepublica,
-}: UseResidentsProps) => {
+}: UseTabResidentsProps) => {
   const [copiadoId, setCopiadoId] = useState<string | null>(null);
   const [moradorParaEditar, setMoradorParaEditar] = useState<Morador | null>(
     null
@@ -93,12 +93,12 @@ export const useResidents = ({
         moradores: republica.moradores.map((m) =>
           m.id === moradorParaEditar.id
             ? {
-              ...m,
-              nome: editForm.nome.trim(),
-              fotoPerfil: editForm.fotoPerfil,
-              telefone: editForm.telefone,
-              chavePix: editForm.chavePix?.trim() || undefined,
-            }
+                ...m,
+                nome: editForm.nome.trim(),
+                fotoPerfil: editForm.fotoPerfil,
+                telefone: editForm.telefone,
+                chavePix: editForm.chavePix?.trim() || undefined,
+              }
             : m
         ),
       };

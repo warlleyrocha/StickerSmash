@@ -4,7 +4,7 @@ import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { EditResidentsModal } from "../../Modals/EditResidentsModal";
 import { ResidentCard } from "./ResidentCard";
-import { useResidents } from "./useResidents";
+import { useTabResidents } from "./useTabResidents";
 
 interface ResidentsTabProps {
   republica: Republica;
@@ -30,7 +30,7 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
     copiarChavePix,
     selecionarImagem,
     updateEditFormField,
-  } = useResidents({ republica, setRepublica });
+  } = useTabResidents({ republica, setRepublica });
 
   const renderMorador = ({ item: morador }: { item: Morador }) => {
     const divida = calcularDividaPorMorador(morador.id);
