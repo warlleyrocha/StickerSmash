@@ -1,5 +1,6 @@
 import { DeleteButton } from "@/components/ui/delete-button";
 import type { Conta, Republica } from "@/types/resume";
+import { formatMounthYear } from "@/utils/formats";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { AddAccountModal } from "../../Modals/AddAccountModal";
@@ -8,9 +9,14 @@ import { useAccounts } from "./useAccounts";
 interface AccountsTabProps {
   readonly republica: Republica;
   readonly setRepublica: (rep: Republica) => void;
+  readonly onOpenAdd?: () => void;
 }
 
-export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
+export function AccountsTab({
+  republica,
+  setRepublica,
+  onOpenAdd,
+}: AccountsTabProps) {
   const {
     copiadoId,
     expandidaId,
@@ -25,7 +31,6 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
     setMostrarContasPagas,
     mostrarContasAbertas,
     setMostrarContasAbertas,
-    formatarMesAno,
     marcarComoPago,
     marcarResponsavelComoPago,
     copiarChavePix,
@@ -277,13 +282,16 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
     mesSelecionado === "todos"
   ) {
     return (
-      <View className="mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
+      <TouchableOpacity
+        className="mt-6 items-center rounded-lg bg-white p-6 shadow-lg"
+        onPress={() => onOpenAdd?.()}
+      >
         <Feather name="dollar-sign" size={48} color="#9ca3af" />
         <Text className="mt-4 text-center text-gray-500">
           Nenhuma conta cadastrada ainda.{"\n"}
-          Clique em &quot;Nova Conta&quot; para adicionar.
+          Toque para adicionar.
         </Text>
-      </View>
+      </TouchableOpacity>
     );
   }
 
@@ -331,7 +339,7 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
                   mesSelecionado === mesAno ? "text-white" : "text-gray-700"
                 }`}
               >
-                {formatarMesAno(mesAno)}
+                {formatMounthYear(mesAno)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -345,7 +353,7 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
         <View className="mx-4 mt-6 items-center rounded-lg bg-white p-6 shadow-sm">
           <Feather name="calendar" size={48} color="#9ca3af" />
           <Text className="mt-4 text-center text-gray-500">
-            Nenhuma conta encontrada para {formatarMesAno(mesSelecionado)}.
+            Nenhuma conta encontrada para {formatMounthYear(mesSelecionado)}.
           </Text>
         </View>
       ) : (
@@ -392,6 +400,13 @@ export function AccountsTab({ republica, setRepublica }: AccountsTabProps) {
               {mostrarContasPagas && contasOrdenadas.pagas.map(renderContaCard)}
             </View>
           )}
+
+          <TouchableOpacity
+            className="items-center rounded-md bg-indigo-600 px-4 py-3 mb-2"
+            onPress={() => onOpenAdd?.()}
+          >
+            <Text className="text-white">+ Nova Conta</Text>
+          </TouchableOpacity>
         </View>
       )}
 

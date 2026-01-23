@@ -37,7 +37,7 @@ export function useSideMenu(
       },
       settings: {
         id: "settings",
-        label: "Configurações",
+        label: "Painel de Controle",
         icon: "settings-outline" as const,
         onPress: navigation.settings,
       },

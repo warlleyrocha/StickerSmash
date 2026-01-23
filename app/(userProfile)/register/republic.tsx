@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 
+import ImageDefault from "@/assets/images/image-register.webp";
 import { useRepublic } from "@/hooks/useRepublic";
 
 const { width, height } = Dimensions.get("window");
@@ -41,7 +42,7 @@ export default function Register() {
         bounces={false}
       >
         <ImageBackground
-          source={require("@/assets/images/image-register.webp")}
+          source={ImageDefault}
           style={{
             width: "100%",
             minHeight: height * 0.4,

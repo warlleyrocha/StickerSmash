@@ -69,6 +69,10 @@ function AppNavigator() {
         options={{ headerTitle: "Register Republic" }}
       />
       <Stack.Screen
+        name="(userProfile)/(republics)/[id]"
+        options={{ headerTitle: "Rep" }}
+      />
+      <Stack.Screen
         name="(userProfile)/home"
         options={{ headerTitle: "Home" }}
       />
@@ -110,7 +114,7 @@ const RootLayout = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <AppNavigator />
-        <Toaster position="top-center" />
+        <Toaster position="bottom-center" />
       </AuthProvider>
     </GestureHandlerRootView>
   );

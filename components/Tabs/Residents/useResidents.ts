@@ -1,8 +1,11 @@
 import type { Morador, Republica } from "@/types/resume";
+import { showToast } from "@/utils/showToast";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { Alert } from "react-native";
+import uuid from "react-native-uuid";
 
 interface UseResidentsProps {
   republica: Republica;
@@ -20,12 +23,14 @@ export const useResidents = ({
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState<{
     nome: string;
-    chavePix: string;
     fotoPerfil?: string;
+    telefone?: string;
+    chavePix: string;
   }>({
     nome: "",
+    fotoPerfil: "",
+    telefone: "",
     chavePix: "",
-    fotoPerfil: undefined,
   });
 
   const abrirNovoMorador = () => {
@@ -36,13 +41,13 @@ export const useResidents = ({
 
   const copiarChavePix = async (morador: Morador) => {
     if (!morador.chavePix) {
-      Alert.alert("Erro", "Morador não possui chave PIX cadastrada.");
+      showToast.error("Morador não possui chave PIX cadastrada.");
       return;
     }
 
     await Clipboard.setStringAsync(morador.chavePix);
     setCopiadoId(morador.id);
-    Alert.alert("Copiado", "Chave PIX copiada para a área de transferência.");
+    showToast.info("Chave copiada para a área de transferência.");
     setTimeout(() => setCopiadoId(null), 1500);
   };
 
@@ -73,61 +78,88 @@ export const useResidents = ({
     setShowEditModal(true);
   };
 
-  const salvarEdicaoMorador = () => {
+  const salvarEdicaoMorador = async () => {
     if (!editForm.nome.trim()) {
-      Alert.alert("Erro", "Informe o nome do morador.");
+      showToast.error("Informe o nome do morador.");
       return;
     }
 
+    let republicaAtualizada: Republica;
+
     if (moradorParaEditar) {
       // Editar morador existente
-      setRepublica({
+      republicaAtualizada = {
         ...republica,
         moradores: republica.moradores.map((m) =>
           m.id === moradorParaEditar.id
             ? {
-                ...m,
-                nome: editForm.nome.trim(),
-                chavePix: editForm.chavePix?.trim() || undefined,
-                fotoPerfil: editForm.fotoPerfil,
-              }
+              ...m,
+              nome: editForm.nome.trim(),
+              fotoPerfil: editForm.fotoPerfil,
+              telefone: editForm.telefone,
+              chavePix: editForm.chavePix?.trim() || undefined,
+            }
             : m
         ),
-      });
-      Alert.alert("Sucesso", "Morador atualizado com sucesso!");
+      };
+      showToast.success("Morador atualizado com sucesso!");
     } else {
       // Adicionar novo morador
       const novo: Morador = {
-        id: Date.now().toString(),
+        id: String(uuid.v4()),
         nome: editForm.nome.trim(),
-        chavePix: editForm.chavePix?.trim() || undefined,
         fotoPerfil: editForm.fotoPerfil,
+        telefone: editForm.telefone?.trim() || undefined,
+        chavePix: editForm.chavePix?.trim() || undefined,
       };
-      setRepublica({
+      republicaAtualizada = {
         ...republica,
         moradores: [...republica.moradores, novo],
-      });
-      Alert.alert("Sucesso", "Morador adicionado com sucesso!");
+      };
+      showToast.success("Morador adicionado com sucesso!");
     }
+
+    // Salvar no AsyncStorage
+    try {
+      const existing = await AsyncStorage.getItem("republic-data");
+      if (existing) {
+        const republicArray = JSON.parse(existing);
+        const index = republicArray.findIndex(
+          (r: Republica) => r.id === republica.id
+        );
+
+        if (index !== -1) {
+          republicArray[index] = republicaAtualizada;
+          await AsyncStorage.setItem(
+            "republic-data",
+            JSON.stringify(republicArray)
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Erro ao salvar morador no AsyncStorage:", error);
+      showToast.error("Erro ao salvar morador.");
+      return;
+    }
+
+    // Atualizar estado local
+    setRepublica(republicaAtualizada);
 
     setShowEditModal(false);
     setMoradorParaEditar(null);
-    setEditForm({ nome: "", chavePix: "", fotoPerfil: undefined });
+    setEditForm({ nome: "", chavePix: "", fotoPerfil: "", telefone: "" });
   };
 
   const fecharEdicaoMorador = () => {
     setShowEditModal(false);
     setMoradorParaEditar(null);
-    setEditForm({ nome: "", chavePix: "", fotoPerfil: undefined });
+    setEditForm({ nome: "", chavePix: "", fotoPerfil: "", telefone: "" });
   };
 
   const selecionarImagem = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert(
-        "Permissão necessária",
-        "Precisamos de permissão para acessar suas fotos!"
-      );
+      showToast.error("Precisamos de permissão para acessar suas fotos!");
       return;
     }
 

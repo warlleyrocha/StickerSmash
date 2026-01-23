@@ -54,7 +54,7 @@ function RepublicImage({ imageUri, size = 50 }: RepublicImageProps) {
 export default function Home() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [tab, setTab] = useState<TabKey>("resumo");
+  const [tab, setTab] = useState<TabKey>("contas");
 
   const [republica, setRepublica] = useState<Republica>(initialRepublica);
 
@@ -121,7 +121,11 @@ export default function Home() {
         return <ResumeTab republica={republica} />;
       case "contas":
         return (
-          <AccountsTab republica={republica} setRepublica={setRepublica} />
+          <AccountsTab
+            republica={republica}
+            setRepublica={setRepublica}
+            onOpenAdd={() => setShowAddModal(true)}
+          />
         );
       case "moradores":
         return (

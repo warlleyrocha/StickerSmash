@@ -17,6 +17,7 @@ import React, {
 interface AuthContextData {
   user: User | null;
   isAuthenticated: boolean;
+  republicData: any;
   loading: boolean;
   error: string | null;
   loginWithGoogle: (token: string) => Promise<AuthResponse | null>;
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true); // Começa true para verificar auth
   const [error, setError] = useState<string | null>(null);
+  const [republicData, setRepublicData] = useState(null);
 
   // Ao montar o componente, verificar se há usuário logado
   useEffect(() => {
@@ -114,7 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   // Logout
@@ -149,7 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await authService.completeProfile(data);
         console.log("✅ Dados enviados com sucesso");
 
-        const updatedUser = await authService.me();
+        const updatedUser = await userService.fetchUser();
 
         // 3️⃣ Atualizar Context
         setUser(updatedUser);
@@ -172,7 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   // Atualizar dados do usuário
@@ -188,18 +190,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  useEffect(() => {
+    AsyncStorage.getItem("republic-data").then((json) => {
+      if (json) {
+        try {
+          const parsed = JSON.parse(json);
+          setRepublicData(parsed);
+        } catch (err) {
+          console.warn("Erro ao parsear republic-data", err);
+        }
+      }
+    });
+  }, []);
+
   const contextValue = React.useMemo(
     () => ({
       user,
       isAuthenticated: !!user,
       loading,
       error,
+      republicData,
       loginWithGoogle,
       logout,
       updateUser,
       completeProfile,
     }),
-    [user, loading, error, loginWithGoogle, logout, updateUser, completeProfile]
+    [
+      user,
+      loading,
+      republicData,
+      error,
+      loginWithGoogle,
+      logout,
+      updateUser,
+      completeProfile,
+    ],
   );
 
   return (

@@ -1,4 +1,4 @@
-import { AddAccountModal } from "@/components/Modals/AddAccountModal";
+import AddAccountModal from "@/components/Modals/AddAccountModal";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
@@ -6,61 +6,104 @@ import Tabs from "@/components/Tabs";
 import { AccountsTab } from "@/components/Tabs/Accounts";
 import { ResidentsTab } from "@/components/Tabs/Residents";
 import { ResumeTab } from "@/components/Tabs/Resume";
+
 import { useAuth } from "@/contexts";
+
+import { useRepublic } from "@/hooks/useRepublic";
+
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
-import { toastErrors } from "@/utils/toastMessages";
-import { useRouter } from "expo-router";
-import React, { useCallback, useMemo, useState } from "react";
-import { Image, Text, TouchableOpacity, View } from "react-native";
 
-const ImageHeader = require("@/assets/images/app-icon/1024.png");
+import { showToast } from "@/utils/showToast";
+import { toastErrors } from "@/utils/toastMessages";
+
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const initialRepublica: Republica = {
+  id: "",
   nome: "",
   moradores: [],
   contas: [],
 };
 
-interface RepublicImageProps {
-  readonly imageUri?: string;
-  readonly size?: number;
-}
-
-function RepublicImage({ imageUri, size = 50 }: RepublicImageProps) {
-  const imageStyle = {
-    width: size,
-    height: size,
-    borderRadius: size / 2,
-  };
-
-  if (imageUri) {
-    return (
-      <Image
-        source={{ uri: imageUri }}
-        style={{ ...imageStyle, resizeMode: "cover" }}
-      />
-    );
-  }
-
-  return (
-    <Image
-      source={ImageHeader}
-      style={{ ...imageStyle, resizeMode: "cover" }}
-    />
-  );
-}
-
 export default function Home() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [tab, setTab] = useState<TabKey>("resumo");
+  const { id: idParam } = useLocalSearchParams<{ id?: string }>();
+  const {
+    fetchRepublicById,
+    updatedRepublic,
+    showEditModal,
+    setShowEditModal,
+  } = useRepublic();
+
+  const [tab, setTab] = useState<TabKey>("contas");
 
   const [republica, setRepublica] = useState<Republica>(initialRepublica);
 
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadRepublic() {
+      if (!idParam) {
+        showToast.error("ID da república não encontrado");
+        router.back();
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const republicData = await fetchRepublicById(idParam);
+
+        if (republicData) {
+          // Mapear RepublicResponse para Republica (se necessário)
+          setRepublica({
+            id: republicData.id,
+            nome: republicData.nome,
+            imagemRepublica: republicData.imagemRepublica,
+            moradores: [],
+            contas: [],
+          });
+          console.log("República carregada:", republicData);
+        } else {
+          showToast.error("República não encontrada");
+          router.back();
+        }
+      } catch (err) {
+        console.error("Erro ao carregar república:", err);
+        showToast.error("Erro ao carregar república");
+        router.back();
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadRepublic();
+  }, [idParam, fetchRepublicById, router]);
+
+  const toggleFavorite = useCallback(() => {
+    setIsFavorited((prev) => {
+      const next = !prev;
+      showToast.success(
+        next
+          ? "República adicionada aos favoritos"
+          : "República removida dos favoritos"
+      );
+      return next;
+    });
+  }, []);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -73,8 +116,16 @@ export default function Home() {
   }, [logout, router]);
   const { menuItems, footerItems } = useSideMenu("home", handleSignOut);
 
-  const handleSaveRepublica = (nome: string, imagem?: string) => {
-    setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
+  const handleSaveRepublica = async (nome: string, imagem?: string) => {
+    const success = await updatedRepublic(republica.id, {
+      nome,
+      imagemRepublica: imagem,
+    });
+
+    // Atualizar estado local apenas se a API teve sucesso
+    if (success) {
+      setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
+    }
   };
 
   const userMenu = useMemo(
@@ -89,7 +140,14 @@ export default function Home() {
   const renderHeader = () => (
     <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
       <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-black">
-        <RepublicImage imageUri={republica.imagemRepublica} />
+        {republica.imagemRepublica ? (
+          <Image
+            source={{ uri: republica.imagemRepublica }}
+            className="h-[50px] w-[50px] rounded-full"
+          />
+        ) : (
+          <Feather name="image" size={48} color="#6b7280" />
+        )}
       </View>
 
       <TouchableOpacity
@@ -105,10 +163,18 @@ export default function Home() {
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => setShowAddModal(true)}
-        className="self-center rounded-md bg-indigo-600 px-4 py-2"
+        onPress={toggleFavorite}
+        className="items-center justify-center rounded-full p-2 mb-2"
+        accessibilityRole="button"
+        accessibilityLabel={
+          isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
+        }
       >
-        <Text className="text-white">+ Nova Conta</Text>
+        <MaterialCommunityIcons
+          name={isFavorited ? "star" : "star-outline"}
+          size={22}
+          color={isFavorited ? "#f59e0b" : "#6b7280"}
+        />
       </TouchableOpacity>
 
       <MenuButton onPress={() => setIsMenuOpen(true)} />
@@ -117,20 +183,33 @@ export default function Home() {
 
   const renderTabContent = () => {
     switch (tab) {
-      case "resumo":
-        return <ResumeTab republica={republica} />;
       case "contas":
         return (
-          <AccountsTab republica={republica} setRepublica={setRepublica} />
+          <AccountsTab
+            republica={republica}
+            setRepublica={setRepublica}
+            onOpenAdd={() => setShowAddModal(true)}
+          />
         );
       case "moradores":
         return (
           <ResidentsTab republica={republica} setRepublica={setRepublica} />
         );
+      case "resumo":
+        return <ResumeTab republica={republica} />;
       default:
         return null;
     }
   };
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 bg-[#FAFAFA] items-center justify-center">
+        <ActivityIndicator size="large" color="#000" />
+        <Text className="mt-4 text-gray-600">Carregando república...</Text>
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-[#FAFAFA]">

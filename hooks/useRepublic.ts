@@ -1,124 +1,191 @@
-import { useAuth } from "@/contexts";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { republicService } from "@/services/republic.service";
+import type { RepublicPost, RepublicResponse } from "@/types/republic.types";
+import { showToast } from "@/utils/showToast";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Alert } from "react-native";
 
 type UseRepublicState = {
-    republicName: string;
-    republicImage?: string;
-    residentName: string;
-    residentPhoto?: string;
-    pixKey: string;
-    phone: string;
+  republicName: string;
+  republicImage?: string;
+  republics: RepublicResponse[];
+  showEditModal: boolean;
 };
 
 type UseRepublicActions = {
-    setRepublicName: (name: string) => void;
-    setRepublicImage: (uri?: string) => void;
-    handleSelectImageRepublic: () => Promise<void>;
-    setResidentName: (name: string) => void;
-    setResidentPhoto: (uri?: string) => void;
-    setPixKey: (key: string) => void;
-    setPhone: (phone: string) => void;
-    handlePress: () => Promise<void>;
+  setRepublicName: (name: string) => void;
+  setRepublicImage: (uri?: string) => void;
+  setRepublics: (republics: RepublicResponse[]) => void;
+  setShowEditModal: (visible: boolean) => void;
+  fetchRepublics: () => Promise<void>;
+  fetchRepublicById: (id: string) => Promise<RepublicResponse | null>;
+  updatedRepublic: (id: string, data: RepublicPost) => Promise<boolean>;
+  deleteRepublic?: (id: string) => Promise<boolean>;
+  handleSelectImageRepublic: () => Promise<void>;
+  handlePress: () => Promise<void>;
 };
 
 type UseRepublicReturn = UseRepublicState & UseRepublicActions;
 
 export function useRepublic(): UseRepublicReturn {
-    const { user } = useAuth();
-    const router = useRouter();
+  const router = useRouter();
 
-    const [republicName, setRepublicName] = useState("");
-    const [republicImage, setRepublicImage] = useState<string | undefined>(
-        undefined
-    );
-    // Inicializa os campos com os dados do usuário logado
-    const [residentName, setResidentName] = useState(user?.nome ?? "");
-    const [pixKey, setPixKey] = useState(user?.email ?? "");
-    const [phone, setPhone] = useState(user?.telefone ?? "");
-    const [residentPhoto, setResidentPhoto] = useState<string | undefined>(
-        user?.fotoPerfil ?? undefined
-    );
+  const [republics, setRepublics] = useState<RepublicResponse[]>([]);
+  const [republicName, setRepublicName] = useState("");
+  const [republicImage, setRepublicImage] = useState<string | undefined>(
+    undefined
+  );
+  const [showEditModal, setShowEditModal] = useState(false);
 
-    const handleSelectImageRepublic = async () => {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== "granted") {
-            Alert.alert(
-                "Permissão necessária",
-                "Precisamos de permissão para acessar suas fotos!"
-            );
-            return;
-        }
+  const handleSelectImageRepublic = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert(
+        "Permissão necessária",
+        "Precisamos de permissão para acessar suas fotos!"
+      );
+      return;
+    }
 
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ["images"],
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 1,
-        });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
 
-        if (!result.canceled) {
-            setRepublicImage(result.assets[0].uri);
-        }
-    };
+    if (!result.canceled) {
+      setRepublicImage(result.assets[0].uri);
+    }
+  };
 
-    const handlePress = async () => {
-        try {
-            console.log("Salvando republica...");
-            const payload = {
-                republic: { name: republicName, image: republicImage },
-                resident: { name: residentName, phone, pixKey, photo: residentPhoto },
-            };
+  const handlePress = async () => {
+    try {
+      console.log("Salvando republica...");
 
-            // Recupera array existente ou inicializa
-            const existing = await AsyncStorage.getItem("republic-data");
-            let republicArray = [];
-            if (existing) {
-                try {
-                    republicArray = JSON.parse(existing);
-                    if (!Array.isArray(republicArray)) republicArray = [];
-                } catch {
-                    republicArray = [];
-                }
-            }
-            republicArray.push(payload);
-            await AsyncStorage.setItem(
-                "republic-data",
-                JSON.stringify(republicArray)
-            );
+      const newRepublic: RepublicPost = {
+        nome: republicName,
+        imagemRepublica: republicImage,
+      };
 
-            console.log("Payload enviado:", payload);
-            console.log("República cadastrada com sucesso");
-            router.push("/(userProfile)/profile");
-        } catch (error) {
-            console.error("Erro ao salvar republica:", error);
-            Alert.alert(
-                "Erro",
-                "Não foi possível salvar a república. Tente novamente."
-            );
-        }
-    };
+      const republicCreated = await republicService.createRepublic(newRepublic);
 
-    return {
-        // Estados dos dados da república
-        republicName,
-        republicImage,
-        residentName,
-        residentPhoto,
-        pixKey,
-        phone,
-        // Funções para atualizar os estados
-        setRepublicName,
-        setRepublicImage,
-        handleSelectImageRepublic,
-        setResidentName,
-        setResidentPhoto,
-        setPixKey,
-        setPhone,
-        // Funções de ação
-        handlePress,
-    };
+      console.log("República cadastrada com sucesso", republicCreated.nome);
+
+      // Navega para a página da república criada
+      router.push(`/(userProfile)/(republics)/${republicCreated.id}`);
+    } catch (error) {
+      console.error("Erro ao salvar republica:", error);
+      Alert.alert(
+        "Erro",
+        "Não foi possível salvar a república. Tente novamente."
+      );
+    }
+  };
+
+  // Função para buscar repúblicas
+  const fetchRepublics = useCallback(async () => {
+    try {
+      const data = await republicService.getRepublics();
+      setRepublics(data);
+    } catch (error) {
+      console.error("Erro ao buscar repúblicas:", error);
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar as repúblicas. Tente novamente."
+      );
+      setRepublics([]);
+    } finally {
+      console.log("Busca de repúblicas finalizada.");
+    }
+  }, []);
+
+  // Função para buscar repúblicas por ID
+  const fetchRepublicById = useCallback(async (id: string) => {
+    try {
+      const republic = await republicService.getRepublicById(id);
+      return republic;
+    } catch (error) {
+      console.error("Erro ao buscar república por ID:", error);
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar a república. Tente novamente."
+      );
+      return null;
+    }
+  }, []);
+
+  // Função para atualizar república
+  const updateRepublic = useCallback(
+    async (id: string, data: RepublicPost): Promise<boolean> => {
+      try {
+        await republicService.updateRepublic(id, data);
+        console.log("República atualizada:", data.nome, data.imagemRepublica);
+
+        // Atualizar a lista de repúblicas após a atualização
+        const updatedRepublics = republics.map((r) =>
+          r.id === id ? { ...r, ...data } : r
+        );
+        setRepublics(updatedRepublics);
+
+        showToast.success("República atualizada com sucesso");
+        return true;
+      } catch (error) {
+        console.error("Erro ao atualizar república:", error);
+        showToast.error("Erro ao atualizar república");
+        return false;
+      }
+    },
+    [republics]
+  );
+
+  // Função para deletar república
+  const deleteRepublic = useCallback(
+    async (id: string): Promise<boolean> => {
+      try {
+        await republicService.deleteRepublic(id);
+        console.log("República deletada:", id);
+
+        // Atualizar a lista de repúblicas após a deleção
+        const updatedRepublics = republics.filter((r) => r.id !== id);
+        setRepublics(updatedRepublics);
+
+        showToast.success("República deletada com sucesso");
+        return true;
+      } catch (error) {
+        console.error("Erro ao deletar república:", error);
+        showToast.error("Erro ao deletar república");
+        return false;
+      }
+    },
+    [republics]
+  );
+
+  // Wrapper para setRepublicImage
+  const setRepublicImageWrapper = (uri?: string) => {
+    setRepublicImage(uri ?? "");
+  };
+
+  return {
+    // Estados dos dados da república
+    republicName,
+    republicImage,
+    republics,
+    showEditModal,
+
+    // Funções para atualizar os estados
+    setRepublicName,
+    setRepublicImage: setRepublicImageWrapper,
+    handleSelectImageRepublic,
+    setRepublics,
+    setShowEditModal,
+
+    // Funções de ação
+    handlePress,
+    fetchRepublics,
+    fetchRepublicById,
+    updatedRepublic: updateRepublic,
+    deleteRepublic,
+  };
 }

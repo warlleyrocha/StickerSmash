@@ -6,10 +6,10 @@ import RepublicCard from "@/components/RepublicCard";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
 import { useAuth } from "@/contexts";
+import { useRepublic } from "@/hooks/useRepublic";
 import { maskPhone } from "@/utils/inputMasks";
 import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
@@ -17,10 +17,11 @@ import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
 export default function SetupProfile() {
   const router = useRouter();
   const { user, logout, completeProfile, updateUser } = useAuth();
+  const { republics, fetchRepublics } = useRepublic();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
-  const [republicas, setRepublicas] = useState<any[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleSignOut = useCallback(async () => {
     try {
@@ -91,28 +92,16 @@ export default function SetupProfile() {
   const { menuItems, footerItems } = useSideMenu("profile", handleSignOut);
 
   useEffect(() => {
-    const getRepublicas = async () => {
-      try {
-        const value = await AsyncStorage.getItem("republic-data");
-        if (value) {
-          const arr = JSON.parse(value);
-          if (Array.isArray(arr)) {
-            setRepublicas(arr);
-          } else {
-            setRepublicas([]);
-          }
-        } else {
-          setRepublicas([]);
-        }
-      } catch (e) {
-        console.error("Erro ao buscar repúblicas do AsyncStorage:", e);
-        setRepublicas([]);
-      }
-    };
-    getRepublicas();
-  }, []);
+    fetchRepublics();
+  }, [fetchRepublics]);
 
-  console.log("📝 Dados da república do AsyncStorage:", republicas);
+  console.log("📝 Dados da república do DB:", republics);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchRepublics();
+    setRefreshing(false);
+  }, [fetchRepublics]);
 
   // Funções de callback para RepublicList
   const handleEditRepublic = (id: string) => {
@@ -123,16 +112,19 @@ export default function SetupProfile() {
   const handleSelectRepublic = (id: string) => {
     // lógica para selecionar república
     // Exemplo: navegar para detalhes
+    console.log("República selecionada:", id);
     router.push(`/(userProfile)/(republics)/${id}`);
   };
 
-  // Mapeia os dados do AsyncStorage para o formato esperado pelo RepublicList
-  const republicasFormatadas = republicas.map((item, idx) => ({
-    id: item.republic?.id || String(idx),
-    nome: item.republic?.name || "Sem nome",
-    imagem: item.republic?.image || null,
-    moradores: 1, // ou ajuste conforme sua lógica
-  }));
+  // Mapeia os dados do AsyncStorage (novo formato) para o formato esperado pelo RepublicList
+  const republicasFormatadas = republics
+    .filter((rep: any) => rep?.id && rep?.nome)
+    .map((rep: any, idx: number) => ({
+      id: rep.id ?? String(idx),
+      nome: rep.nome ?? "Sem nome",
+      imagem: rep.imagemRepublica ?? null,
+      moradores: Array.isArray(rep.moradores) ? rep.moradores.length : 1,
+    }));
 
   const renderContent = () => {
     if (!user?.perfilCompleto) {
@@ -156,6 +148,8 @@ export default function SetupProfile() {
         onSelectRepublic={handleSelectRepublic}
         onCreateRepublic={handleCreateRepublic}
         RepublicCard={RepublicCard}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
     );
   };

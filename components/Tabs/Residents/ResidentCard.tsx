@@ -43,7 +43,9 @@ export const ResidentCard: React.FC<ResidentCardProps> = ({
             </View>
 
             <View>
-              <Text className="text-lg font-semibold">{morador.nome}</Text>
+              <Text className="text-lg font-semibold w-[150px]">
+                {morador.nome}
+              </Text>
               <Text className="text-sm text-gray-500">
                 {qtdContasPendentes}{" "}
                 {qtdContasPendentes === 1
