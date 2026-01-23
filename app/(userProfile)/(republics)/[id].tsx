@@ -118,7 +118,12 @@ export default function Home() {
       toastErrors.logoutFailed();
     }
   }, [logout, router]);
-  const { menuItems, footerItems } = useSideMenu("home", handleSignOut);
+
+  const { menuItems, footerItems } = useSideMenu(
+    "home",
+    handleSignOut,
+    republica.id
+  );
 
   const handleSaveRepublica = async (nome: string, imagem?: string) => {
     const success = await updatedRepublic(republica.id, {

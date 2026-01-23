@@ -4,7 +4,8 @@ import { useMemo } from "react";
 
 export function useSideMenu(
   context: UserMenuContext,
-  handleSignOut: () => void
+  handleSignOut: () => void,
+  republicId?: string // Adicione este parâmetro
 ) {
   const router = useRouter();
 
@@ -12,6 +13,13 @@ export function useSideMenu(
     home: () => router.push("/"),
     profile: () => router.push("/(userProfile)/profile"),
     invites: () => router.push("/(userProfile)/invites"),
+    invitesSent: () => {
+      if (republicId) {
+        router.push(`/(userProfile)/invitesSent?republicId=${republicId}`);
+      } else {
+        router.push("/(userProfile)/invitesSent");
+      }
+    },
     settings: () => router.push("/(userProfile)/settings"),
   };
 
@@ -35,6 +43,12 @@ export function useSideMenu(
         icon: "mail-outline" as const,
         onPress: navigation.invites,
       },
+      invitesSent: {
+        id: "invitesSent",
+        label: "Convites Enviados",
+        icon: "mail-outline" as const,
+        onPress: navigation.invitesSent,
+      },
       settings: {
         id: "settings",
         label: "Painel de Controle",
@@ -45,7 +59,7 @@ export function useSideMenu(
 
     switch (context) {
       case "home":
-        return [base.home, base.profile, base.invites];
+        return [base.home, base.profile, base.invitesSent];
 
       case "profile":
         return [base.home, base.invites, base.settings];
@@ -58,9 +72,11 @@ export function useSideMenu(
     }
   }, [
     context,
+    republicId, // Adicione republicId nas dependências
     navigation.home,
     navigation.profile,
     navigation.invites,
+    navigation.invitesSent,
     navigation.settings,
   ]);
 
