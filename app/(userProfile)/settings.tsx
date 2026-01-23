@@ -1,10 +1,13 @@
 import Header from "@/components/Header";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
+import { InviteModal } from "@/components/Modals/InviteModal";
 import LoadingScreen from "@/components/ui/loading-screen";
 import { useAuth } from "@/contexts/AuthContext";
+import { useInvites } from "@/hooks/useInvite";
 import { useRepublic } from "@/hooks/useRepublic";
 import type { RepublicResponse } from "@/types/republic.types";
 import { showToast } from "@/utils/showToast";
+import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useEffect, useState } from "react";
 import {
@@ -27,6 +30,18 @@ const ControlPanel = () => {
     showEditModal,
     setShowEditModal,
   } = useRepublic();
+
+  const [inviteRepublicId, setInviteRepublicId] = useState<string | undefined>(
+    undefined
+  );
+
+  const {
+    sendInvite,
+    loading: inviteLoading,
+    error,
+  } = useInvites(inviteRepublicId);
+  const [modalOpen, setModalOpen] = useState(false);
+
   const [refreshing, setRefreshing] = useState(false);
   const [selectedRepublic, setSelectedRepublic] =
     useState<RepublicResponse | null>(null);
@@ -164,6 +179,15 @@ const ControlPanel = () => {
                   {/* Ações */}
                   <View className="flex-row items-center gap-2 pr-4">
                     <TouchableOpacity
+                      onPress={() => {
+                        setInviteRepublicId(republic.id);
+                        setModalOpen(true);
+                      }}
+                    >
+                      <Feather name="user-plus" size={20} color="#6B7280" />
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
                       onPress={() => handleEditRepublic(republic)}
                       className="h-10 w-10 items-center justify-center rounded-lg bg-blue-50"
                     >
@@ -206,6 +230,18 @@ const ControlPanel = () => {
         currentName={selectedRepublic?.nome || ""}
         currentImage={selectedRepublic?.imagemRepublica}
         onSave={handleSaveEdit}
+      />
+
+      <InviteModal
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setInviteRepublicId(undefined);
+        }}
+        republicaId={inviteRepublicId!}
+        sendInvite={sendInvite}
+        loading={inviteLoading}
+        error={error}
       />
     </View>
   );
