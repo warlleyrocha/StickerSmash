@@ -2,11 +2,17 @@ import Header from "@/components/Header";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
 import { InviteModal } from "@/components/Modals/InviteModal";
 import LoadingScreen from "@/components/ui/loading-screen";
+
 import { useAuth } from "@/contexts/AuthContext";
+
 import { useInvites } from "@/hooks/useInvite";
 import { useRepublic } from "@/hooks/useRepublic";
+import { useRepublicResidents } from "@/hooks/useRepublicResidents";
+
 import type { RepublicResponse } from "@/types/republic.types";
+
 import { showToast } from "@/utils/showToast";
+
 import { Feather } from "@expo/vector-icons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import React, { useEffect, useState } from "react";
@@ -22,6 +28,7 @@ import {
 
 const ControlPanel = () => {
   const { user, loading } = useAuth();
+
   const {
     republics,
     fetchRepublics,
@@ -31,17 +38,15 @@ const ControlPanel = () => {
     setShowEditModal,
   } = useRepublic();
 
+  const { getResidentsCount } = useRepublicResidents(republics);
+
   const [inviteRepublicId, setInviteRepublicId] = useState<string | undefined>(
     undefined
   );
 
-  const {
-    sendInvite,
-    loading: inviteLoading,
-    error,
-  } = useInvites(inviteRepublicId);
-  const [modalOpen, setModalOpen] = useState(false);
+  const { sendInvite, loading: inviteLoading, error } = useInvites();
 
+  const [modalOpen, setModalOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedRepublic, setSelectedRepublic] =
     useState<RepublicResponse | null>(null);
@@ -171,7 +176,10 @@ const ControlPanel = () => {
                         color="#6B7280"
                       />
                       <Text className="ml-1 text-sm text-gray-500">
-                        0 moradores
+                        {getResidentsCount(republic.id)}{" "}
+                        {getResidentsCount(republic.id) === 1
+                          ? "morador"
+                          : "moradores"}
                       </Text>
                     </View>
                   </View>

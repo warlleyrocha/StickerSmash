@@ -1,19 +1,17 @@
+import type { RepublicResponse } from "@/types/republic.types";
 import { Ionicons } from "@expo/vector-icons";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 interface RepublicaCardProps {
-  readonly republica: {
-    readonly id: string;
-    readonly nome: string;
-    readonly imagem: string | null;
-    readonly moradores: number;
-  };
+  readonly republic: RepublicResponse;
+  readonly residentsCount?: number;
   readonly onEdit: () => void;
   readonly onSelect: () => void;
 }
 
 export default function RepublicCard({
-  republica,
+  republic,
+  residentsCount = 0,
   onEdit,
   onSelect,
 }: RepublicaCardProps) {
@@ -25,9 +23,9 @@ export default function RepublicCard({
     >
       {/* Imagem */}
       <View className="h-36 w-full items-center justify-center overflow-hidden bg-gray-100">
-        {republica.imagem ? (
+        {republic.imagemRepublica ? (
           <Image
-            source={{ uri: republica.imagem }}
+            source={{ uri: republic.imagemRepublica }}
             style={{ width: "100%", height: "100%" }}
             resizeMode="cover"
           />
@@ -39,14 +37,16 @@ export default function RepublicCard({
       {/* Info */}
       <View className="p-4">
         <Text className="text-lg font-bold text-gray-800" numberOfLines={2}>
-          {republica.nome}
+          {republic.nome}
         </Text>
 
         <View className="mt-2 flex-row items-center justify-between">
-          <Text className="text-sm font-medium text-blue-500">
-            {republica.moradores}{" "}
-            {republica.moradores === 1 ? "morador" : "moradores"}
-          </Text>
+          <View className="flex-row items-center">
+            <Ionicons name="people-outline" size={14} color="#3B82F6" />
+            <Text className="ml-1 text-sm font-medium text-gray-600">
+              {residentsCount} {residentsCount === 1 ? "morador" : "moradores"}
+            </Text>
+          </View>
 
           <TouchableOpacity
             onPress={onEdit}

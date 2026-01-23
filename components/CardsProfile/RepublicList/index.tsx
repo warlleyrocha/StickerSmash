@@ -1,3 +1,5 @@
+import { useRepublicResidents } from "@/hooks/useRepublicResidents";
+import type { RepublicResponse } from "@/types/republic.types";
 import { Ionicons } from "@expo/vector-icons";
 import {
   RefreshControl,
@@ -7,20 +9,15 @@ import {
   View,
 } from "react-native";
 
-interface Republica {
-  readonly id: string;
-  readonly nome: string;
-  readonly imagem: string | null;
-  readonly moradores: number;
-}
-
 interface RepublicListProps {
-  readonly republicas: Republica[];
+  readonly republics: RepublicResponse[];
   readonly onEditRepublic: (id: string) => void;
   readonly onSelectRepublic: (id: string) => void;
   readonly onCreateRepublic: () => void;
   readonly RepublicCard: React.ComponentType<{
-    republica: Republica;
+    republic: RepublicResponse;
+    residentsCount?: number;
+
     onEdit: () => void;
     onSelect: () => void;
   }>;
@@ -29,7 +26,7 @@ interface RepublicListProps {
 }
 
 export default function RepublicList({
-  republicas,
+  republics,
   onEditRepublic,
   onSelectRepublic,
   onCreateRepublic,
@@ -37,6 +34,8 @@ export default function RepublicList({
   refreshing = false,
   onRefresh,
 }: RepublicListProps) {
+  const { getResidentsCount } = useRepublicResidents(republics);
+
   return (
     <ScrollView
       className="flex-1 px-6 pt-6"
@@ -56,12 +55,13 @@ export default function RepublicList({
       </Text>
 
       <View className="flex-row flex-wrap gap-4">
-        {republicas.map((republica) => (
+        {republics.map((republic) => (
           <RepublicCard
-            key={republica.id}
-            republica={republica}
-            onEdit={() => onEditRepublic(republica.id)}
-            onSelect={() => onSelectRepublic(republica.id)}
+            key={republic.id}
+            republic={republic}
+            residentsCount={getResidentsCount(republic.id)}
+            onEdit={() => onEditRepublic(republic.id)}
+            onSelect={() => onSelectRepublic(republic.id)}
           />
         ))}
       </View>

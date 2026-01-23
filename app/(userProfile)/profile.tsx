@@ -5,8 +5,11 @@ import { EditProfileModal } from "@/components/Modals/EditProfileModal";
 import RepublicCard from "@/components/RepublicCard";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
+
 import { useAuth } from "@/contexts";
+
 import { useRepublic } from "@/hooks/useRepublic";
+
 import { maskPhone } from "@/utils/inputMasks";
 import { showToast } from "@/utils/showToast";
 import { toastErrors } from "@/utils/toastMessages";
@@ -116,23 +119,13 @@ export default function SetupProfile() {
     router.push(`/(userProfile)/(republics)/${id}`);
   };
 
-  // Mapeia os dados do AsyncStorage (novo formato) para o formato esperado pelo RepublicList
-  const republicasFormatadas = republics
-    .filter((rep: any) => rep?.id && rep?.nome)
-    .map((rep: any, idx: number) => ({
-      id: rep.id ?? String(idx),
-      nome: rep.nome ?? "Sem nome",
-      imagem: rep.imagemRepublica ?? null,
-      moradores: Array.isArray(rep.moradores) ? rep.moradores.length : 1,
-    }));
-
   const renderContent = () => {
     if (!user?.perfilCompleto) {
       return (
         <IncompleteProfile onContinue={() => setShowEditProfileModal(true)} />
       );
     }
-    if (user.perfilCompleto && republicasFormatadas.length === 0) {
+    if (user.perfilCompleto && republics.length === 0) {
       return (
         <EmptyRepublic
           onCreateRepublic={handleCreateRepublic}
@@ -143,7 +136,7 @@ export default function SetupProfile() {
     // Exibe lista de repúblicas
     return (
       <RepublicList
-        republicas={republicasFormatadas}
+        republics={republics}
         onEditRepublic={handleEditRepublic}
         onSelectRepublic={handleSelectRepublic}
         onCreateRepublic={handleCreateRepublic}
