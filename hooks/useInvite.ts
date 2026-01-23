@@ -1,6 +1,6 @@
 import { inviteService } from "@/services/invite.service";
 import type {
-  InviteFetch,
+  Invite,
   InviteRequest,
   PatchInviteStatusResponse,
   StatusInvite,
@@ -8,7 +8,7 @@ import type {
 import { useCallback, useState } from "react";
 
 export function useInvites(republicaId?: string) {
-  const [invites, setInvites] = useState<InviteFetch[]>([]);
+  const [invites, setInvites] = useState<Invite[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,15 +34,7 @@ export function useInvites(republicaId?: string) {
     setError(null);
     try {
       const response = await inviteService.sendInvite(payload);
-      // Opcionalmente já insere na lista
-      setInvites((prev) => [
-        ...prev,
-        {
-          id: response.id,
-          usuarioId: response.usuarioId,
-          status: response.status,
-        },
-      ]);
+
       return response;
     } catch (err: any) {
       setError(err.message || "Erro ao enviar convite.");

@@ -1,8 +1,7 @@
 import { api } from "@/services/api";
 import {
-  InviteFetch,
+  Invite,
   InviteRequest,
-  InviteResponse,
   PatchInviteStatusResponse,
   StatusInvite,
 } from "@/types/invite.types";
@@ -10,9 +9,9 @@ import { AxiosError } from "axios";
 
 export const inviteService = {
   // Método para enviar um convite
-  sendInvite: async (data: InviteRequest): Promise<InviteResponse> => {
+  sendInvite: async (data: InviteRequest): Promise<Invite> => {
     try {
-      const response = await api.post<InviteResponse>("/convites", data);
+      const response = await api.post<Invite>("/convites", data);
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
@@ -32,11 +31,9 @@ export const inviteService = {
   },
 
   // Método para listar convites de uma república
-  getInvitesByRepublicId: async (
-    republicaId: string
-  ): Promise<InviteFetch[]> => {
+  getInvitesByRepublicId: async (republicaId: string): Promise<Invite[]> => {
     try {
-      const response = await api.get<InviteFetch[]>(
+      const response = await api.get<Invite[]>(
         `/convites/republica/${republicaId}`
       );
       return response.data;
