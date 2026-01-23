@@ -10,6 +10,7 @@ import { ResumeTab } from "@/components/Tabs/Resume";
 import { useAuth } from "@/contexts";
 
 import { useRepublic } from "@/hooks/useRepublic";
+import { useResidents } from "@/hooks/useResidents";
 
 import type { Republica } from "@/types/resume";
 import type { TabKey } from "@/types/tabs";
@@ -45,6 +46,7 @@ export default function Home() {
     showEditModal,
     setShowEditModal,
   } = useRepublic();
+  const { fetchResidents } = useResidents();
 
   const [tab, setTab] = useState<TabKey>("contas");
 
@@ -66,17 +68,19 @@ export default function Home() {
       setIsLoading(true);
       try {
         const republicData = await fetchRepublicById(idParam);
+        const residentsData = await fetchResidents(idParam);
 
-        if (republicData) {
+        if (republicData && residentsData) {
           // Mapear RepublicResponse para Republica (se necessário)
           setRepublica({
             id: republicData.id,
             nome: republicData.nome,
             imagemRepublica: republicData.imagemRepublica,
-            moradores: [],
+            moradores: residentsData,
             contas: [],
           });
           console.log("República carregada:", republicData);
+          console.log("Moradores carregados:", residentsData);
         } else {
           showToast.error("República não encontrada");
           router.back();
@@ -91,7 +95,7 @@ export default function Home() {
     }
 
     loadRepublic();
-  }, [idParam, fetchRepublicById, router]);
+  }, [idParam, fetchRepublicById, fetchResidents, router]);
 
   const toggleFavorite = useCallback(() => {
     setIsFavorited((prev) => {
