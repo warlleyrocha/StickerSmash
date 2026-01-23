@@ -7,26 +7,10 @@ import type {
 } from "@/types/invite.types";
 import { useCallback, useState } from "react";
 
-export function useInvites(republicaId?: string) {
+export function useInvites() {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Buscar convites da república
-  const fetchInvites = useCallback(async () => {
-    if (!republicaId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await inviteService.getInvitesByRepublicId(republicaId);
-      setInvites(data);
-      return data;
-    } catch (err: any) {
-      setError(err.message || "Erro ao buscar convites.");
-    } finally {
-      setLoading(false);
-    }
-  }, [republicaId]);
 
   // Enviar convite
   const sendInvite = useCallback(async (payload: InviteRequest) => {
@@ -39,6 +23,24 @@ export function useInvites(republicaId?: string) {
     } catch (err: any) {
       setError(err.message || "Erro ao enviar convite.");
       throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Buscar convites da república
+  const fetchInvites = useCallback(async (republicaId: string) => {
+    if (!republicaId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await inviteService.getInvitesByRepublicId(republicaId);
+      setInvites(data);
+      return data;
+    } catch (err: any) {
+      setError(err.message || "Erro ao buscar convites.");
     } finally {
       setLoading(false);
     }
