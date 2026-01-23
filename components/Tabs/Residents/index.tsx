@@ -2,7 +2,6 @@ import type { Morador, Republica } from "@/types/resume";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { EditResidentsModal } from "../../Modals/EditResidentsModal";
 import { ResidentCard } from "./ResidentCard";
 import { useTabResidents } from "./useTabResidents";
 
@@ -17,19 +16,14 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
 }) => {
   const {
     copiadoId,
-    moradorParaEditar,
-    showEditModal,
-    editForm,
+
     abrirNovoMorador,
     abrirEdicaoMorador,
-    salvarEdicaoMorador,
-    fecharEdicaoMorador,
+
     deletarMorador,
     calcularDividaPorMorador,
     quantidadeContasPendentes,
     copiarChavePix,
-    selecionarImagem,
-    updateEditFormField,
   } = useTabResidents({ republica, setRepublica });
 
   const renderMorador = ({ item: morador }: { item: Morador }) => {
@@ -71,17 +65,6 @@ export const ResidentsTab: React.FC<ResidentsTabProps> = ({
         renderItem={renderMorador}
         ItemSeparatorComponent={renderItemSeparator}
         contentContainerStyle={{ paddingBottom: 130 }}
-      />
-
-      {/* Modal de Edição de Morador */}
-      <EditResidentsModal
-        visible={showEditModal}
-        isEditMode={!!moradorParaEditar}
-        editForm={editForm}
-        onClose={fecharEdicaoMorador}
-        onSave={salvarEdicaoMorador}
-        onSelectImage={selecionarImagem}
-        onUpdateField={updateEditFormField}
       />
     </View>
   );
