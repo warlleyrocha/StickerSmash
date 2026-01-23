@@ -72,10 +72,6 @@ function AppNavigator() {
         name="(userProfile)/(republics)/[id]"
         options={{ headerTitle: "Rep" }}
       />
-      <Stack.Screen
-        name="(userProfile)/home"
-        options={{ headerTitle: "Home" }}
-      />
     </Stack>
   );
 }
