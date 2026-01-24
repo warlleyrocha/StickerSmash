@@ -1,70 +1,48 @@
-import type { Morador, Republica } from "@/types/resume";
+import type { ResidentResponse } from "@/types/resident.types";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { ResidentCard } from "./ResidentCard";
 import { useTabResidents } from "./useTabResidents";
 
 interface ResidentsTabProps {
-  republica: Republica;
-  setRepublica: (rep: Republica) => void;
+  residents: ResidentResponse[];
 }
 
-export const ResidentsTab: React.FC<ResidentsTabProps> = ({
-  republica,
-  setRepublica,
-}) => {
-  const {
-    copiadoId,
+export const ResidentsTab: React.FC<ResidentsTabProps> = ({ residents }) => {
+  const { copiadoId, copiarChavePix } = useTabResidents();
 
-    abrirNovoMorador,
-    abrirEdicaoMorador,
-
-    deletarMorador,
-    calcularDividaPorMorador,
-    quantidadeContasPendentes,
-    copiarChavePix,
-  } = useTabResidents({ republica, setRepublica });
-
-  const renderMorador = ({ item: morador }: { item: Morador }) => {
-    const divida = calcularDividaPorMorador(morador.id);
-    const qtd = quantidadeContasPendentes(morador.id);
-
+  const renderMorador = ({ item }: { item: ResidentResponse }) => {
     return (
       <ResidentCard
-        morador={morador}
-        divida={divida}
-        qtdContasPendentes={qtd}
+        morador={item}
         copiadoId={copiadoId}
-        onPress={abrirEdicaoMorador}
         onCopyPix={copiarChavePix}
-        onDelete={deletarMorador}
       />
     );
   };
 
   const renderItemSeparator = () => <View className="h-4" />;
 
-  return (
-    <View className="space-y-4">
-      {/* botão adicionar */}
-      <TouchableOpacity
-        onPress={abrirNovoMorador}
-        className="mb-5 mt-2 items-center rounded-md bg-indigo-600 py-3"
-      >
-        <View className="flex-row items-center">
-          <Feather name="plus" size={16} color="#fff" />
-          <Text className="ml-2 font-medium text-white">Adicionar Morador</Text>
-        </View>
-      </TouchableOpacity>
+  const renderEmptyState = () => (
+    <View className="flex-1 items-center justify-center py-20">
+      <Feather name="users" size={64} color="#D1D5DB" />
+      <Text className="mt-4 text-base text-gray-500">
+        Nenhum morador cadastrado
+      </Text>
+    </View>
+  );
 
-      {/* lista de moradores */}
+  return (
+    <View className="flex-1">
       <FlatList
-        data={republica.moradores}
+        data={residents}
         keyExtractor={(m) => m.id}
         renderItem={renderMorador}
         ItemSeparatorComponent={renderItemSeparator}
+        ListEmptyComponent={renderEmptyState}
         contentContainerStyle={{ paddingBottom: 130 }}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );

@@ -1,32 +1,22 @@
-import { DeleteButton } from "@/components/ui/delete-button";
-import type { Morador } from "@/types/resume";
+import type { ResidentResponse } from "@/types/resident.types";
+
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 interface ResidentCardProps {
-  morador: Morador;
-  divida: number;
-  qtdContasPendentes: number;
+  morador: ResidentResponse;
   copiadoId: string | null;
-  onPress: (morador: Morador) => void;
-  onCopyPix: (morador: Morador) => void;
-  onDelete: (morador: Morador) => void;
+  onCopyPix: (morador: ResidentResponse) => void;
 }
 
 export const ResidentCard: React.FC<ResidentCardProps> = ({
   morador,
-  divida,
-  qtdContasPendentes,
   copiadoId,
-  onPress,
   onCopyPix,
-  onDelete,
 }) => {
-  const isPendente = divida > 0;
-
   return (
-    <TouchableOpacity onPress={() => onPress(morador)} activeOpacity={0.7}>
+    <View>
       <View className="rounded-lg bg-white p-4 shadow-sm">
         {/* header */}
         <View className="flex-row items-start justify-between">
@@ -46,31 +36,12 @@ export const ResidentCard: React.FC<ResidentCardProps> = ({
               <Text className="text-lg font-semibold w-[150px]">
                 {morador.nome}
               </Text>
-              <Text className="text-sm text-gray-500">
-                {qtdContasPendentes}{" "}
-                {qtdContasPendentes === 1
-                  ? "conta pendente"
-                  : "contas pendentes"}
-              </Text>
+              <Text className="text-sm text-gray-500">1 Conta Pendente</Text>
             </View>
           </View>
 
-          <View className="flex-row items-center gap-2">
-            <DeleteButton onPress={() => onDelete(morador)} />
-
-            <View
-              className={`rounded-md border px-3 py-1 ${
-                isPendente ? "border-orange-600" : "border-green-600"
-              }`}
-            >
-              <Text
-                className={`text-sm ${
-                  isPendente ? "text-orange-600" : "text-green-600"
-                }`}
-              >
-                {isPendente ? "Pendente" : "Em dia"}
-              </Text>
-            </View>
+          <View className="flex-row items-center gap-2 rounded-md border px-3 border-orange-600">
+            <Text className="text-sm text-orange-500">Pendente</Text>
           </View>
         </View>
 
@@ -78,15 +49,7 @@ export const ResidentCard: React.FC<ResidentCardProps> = ({
         <View className="mt-3 space-y-3">
           <View className="mt-2 flex-row justify-between rounded-lg bg-gray-50 p-3">
             <Text className="mb-1 text-sm text-gray-600">Valor Pendente</Text>
-            <Text
-              className={
-                isPendente
-                  ? "font-semibold text-orange-600"
-                  : "font-semibold text-green-600"
-              }
-            >
-              R$ {divida.toFixed(2)}
-            </Text>
+            <Text className="font-semibold text-orange-600">R$ 20</Text>
           </View>
 
           {morador.chavePix ? (
@@ -116,6 +79,6 @@ export const ResidentCard: React.FC<ResidentCardProps> = ({
           ) : null}
         </View>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };

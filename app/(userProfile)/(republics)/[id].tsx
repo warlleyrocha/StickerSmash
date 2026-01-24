@@ -1,4 +1,4 @@
-import AddAccountModal from "@/components/Modals/AddAccountModal";
+import { AddAccountModal } from "@/components/Modals/AddAccountModal";
 import { EditRepublicModal } from "@/components/Modals/EditRepublicModal";
 import { MenuButton, SideMenu } from "@/components/SideMenu";
 import { useSideMenu } from "@/components/SideMenu/useSideMenu";
@@ -12,7 +12,7 @@ import { useAuth } from "@/contexts";
 import { useRepublic } from "@/hooks/useRepublic";
 import { useResidents } from "@/hooks/useResidents";
 
-import type { Republica } from "@/types/resume";
+import type { RepublicResponse } from "@/types/republic.types";
 import type { TabKey } from "@/types/tabs";
 
 import { showToast } from "@/utils/showToast";
@@ -29,29 +29,22 @@ import {
   View,
 } from "react-native";
 
-const initialRepublica: Republica = {
-  id: "",
-  nome: "",
-  moradores: [],
-  contas: [],
-};
-
 export default function Home() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const { id: idParam } = useLocalSearchParams<{ id?: string }>();
+
   const {
     fetchRepublicById,
     updatedRepublic,
     showEditModal,
     setShowEditModal,
   } = useRepublic();
-  const { fetchResidents } = useResidents();
+
+  const { residents, fetchResidents } = useResidents();
 
   const [tab, setTab] = useState<TabKey>("contas");
-
-  const [republica, setRepublica] = useState<Republica>(initialRepublica);
-
+  const [republic, setRepublic] = useState<RepublicResponse | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
@@ -68,19 +61,10 @@ export default function Home() {
       setIsLoading(true);
       try {
         const republicData = await fetchRepublicById(idParam);
-        const residentsData = await fetchResidents(idParam);
 
-        if (republicData && residentsData) {
-          // Mapear RepublicResponse para Republica (se necessário)
-          setRepublica({
-            id: republicData.id,
-            nome: republicData.nome,
-            imagemRepublica: republicData.imagemRepublica,
-            moradores: residentsData,
-            contas: [],
-          });
+        if (republicData) {
+          setRepublic(republicData);
           console.log("República carregada:", republicData);
-          console.log("Moradores carregados:", residentsData);
         } else {
           showToast.error("República não encontrada");
           router.back();
@@ -95,7 +79,13 @@ export default function Home() {
     }
 
     loadRepublic();
-  }, [idParam, fetchRepublicById, fetchResidents, router]);
+  }, [idParam, fetchRepublicById, router]);
+
+  useEffect(() => {
+    if (republic?.id) {
+      fetchResidents(republic.id);
+    }
+  }, [republic?.id, fetchResidents]);
 
   const toggleFavorite = useCallback(() => {
     setIsFavorited((prev) => {
@@ -122,18 +112,22 @@ export default function Home() {
   const { menuItems, footerItems } = useSideMenu(
     "home",
     handleSignOut,
-    republica.id
+    republic?.id
   );
 
   const handleSaveRepublica = async (nome: string, imagem?: string) => {
-    const success = await updatedRepublic(republica.id, {
+    if (!republic) return;
+
+    const success = await updatedRepublic(republic.id, {
       nome,
       imagemRepublica: imagem,
     });
 
-    // Atualizar estado local apenas se a API teve sucesso
+    // Atualizar estado local se sucesso
     if (success) {
-      setRepublica((prev) => ({ ...prev, nome, imagemRepublica: imagem }));
+      setRepublic((prev) =>
+        prev ? { ...prev, nome, imagemRepublica: imagem } : null
+      );
     }
   };
 
@@ -146,66 +140,62 @@ export default function Home() {
     [user?.nome, user?.fotoPerfil, user?.email]
   );
 
-  const renderHeader = () => (
-    <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
-      <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-black">
-        {republica.imagemRepublica ? (
-          <Image
-            source={{ uri: republica.imagemRepublica }}
-            className="h-[50px] w-[50px] rounded-full"
+  const renderHeader = () => {
+    if (!republic) return null;
+
+    return (
+      <View className="mt-[32px] flex-row gap-3 border-b border-b-black/10 bg-[#FAFAFA] px-[16px] py-4">
+        <View className="h-[50px] w-[50px] items-center justify-center rounded-full bg-black">
+          {republic.imagemRepublica ? (
+            <Image
+              source={{ uri: republic.imagemRepublica }}
+              className="h-[50px] w-[50px] rounded-full"
+            />
+          ) : (
+            <Feather name="image" size={48} color="#6b7280" />
+          )}
+        </View>
+
+        <TouchableOpacity
+          onPress={() => setShowEditModal(true)}
+          className="flex-1 justify-center"
+        >
+          <Text className="text-base font-semibold">
+            {republic.nome || "República"}
+          </Text>
+          <Text className="text-sm text-gray-500">0 Morador</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={toggleFavorite}
+          className="items-center justify-center rounded-full p-2 mb-2"
+          accessibilityRole="button"
+          accessibilityLabel={
+            isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
+          }
+        >
+          <MaterialCommunityIcons
+            name={isFavorited ? "star" : "star-outline"}
+            size={22}
+            color={isFavorited ? "#f59e0b" : "#6b7280"}
           />
-        ) : (
-          <Feather name="image" size={48} color="#6b7280" />
-        )}
+        </TouchableOpacity>
+
+        <MenuButton onPress={() => setIsMenuOpen(true)} />
       </View>
-
-      <TouchableOpacity
-        onPress={() => setShowEditModal(true)}
-        className="flex-1 justify-center"
-      >
-        <Text className="text-base font-semibold">
-          {republica.nome || "República"}
-        </Text>
-        <Text className="text-sm text-gray-500">
-          {republica.moradores?.length || 0} moradores
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={toggleFavorite}
-        className="items-center justify-center rounded-full p-2 mb-2"
-        accessibilityRole="button"
-        accessibilityLabel={
-          isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
-        }
-      >
-        <MaterialCommunityIcons
-          name={isFavorited ? "star" : "star-outline"}
-          size={22}
-          color={isFavorited ? "#f59e0b" : "#6b7280"}
-        />
-      </TouchableOpacity>
-
-      <MenuButton onPress={() => setIsMenuOpen(true)} />
-    </View>
-  );
+    );
+  };
 
   const renderTabContent = () => {
+    if (!republic) return null;
+
     switch (tab) {
       case "contas":
-        return (
-          <AccountsTab
-            republica={republica}
-            setRepublica={setRepublica}
-            onOpenAdd={() => setShowAddModal(true)}
-          />
-        );
+        return <AccountsTab />;
       case "moradores":
-        return (
-          <ResidentsTab republica={republica} setRepublica={setRepublica} />
-        );
+        return <ResidentsTab residents={residents} />;
       case "resumo":
-        return <ResumeTab republica={republica} />;
+        return <ResumeTab />;
       default:
         return null;
     }
@@ -216,6 +206,15 @@ export default function Home() {
       <View className="flex-1 bg-[#FAFAFA] items-center justify-center">
         <ActivityIndicator size="large" color="#000" />
         <Text className="mt-4 text-gray-600">Carregando república...</Text>
+      </View>
+    );
+  }
+
+  if (!republic) {
+    return (
+      <View className="flex-1 bg-[#FAFAFA] items-center justify-center">
+        <MaterialCommunityIcons name="home-alert" size={64} color="#9CA3AF" />
+        <Text className="mt-4 text-gray-600">República não encontrada</Text>
       </View>
     );
   }
@@ -232,15 +231,13 @@ export default function Home() {
       <AddAccountModal
         visible={showAddModal}
         onClose={() => setShowAddModal(false)}
-        republica={republica}
-        setRepublica={setRepublica}
       />
 
       <EditRepublicModal
         visible={showEditModal}
         onClose={() => setShowEditModal(false)}
-        currentName={republica.nome}
-        currentImage={republica.imagemRepublica}
+        currentName={republic.nome}
+        currentImage={republic.imagemRepublica}
         onSave={handleSaveRepublica}
       />
 
