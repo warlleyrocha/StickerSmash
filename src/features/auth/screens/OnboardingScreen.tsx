@@ -1,7 +1,7 @@
-import OnboardingButtons from "@/src/components/Onboarding/OnboardingButtons";
-import RenderDots from "@/src/components/Onboarding/RenderDots";
-import RenderSlide from "@/src/components/Onboarding/RenderSlide";
-import { slides } from "@/src/constants/slides";
+import OnboardingButtons from "@/src/features/auth/components/onboarding/OnboardingButtons";
+import RenderDots from "@/src/features/auth/components/onboarding/RenderDots";
+import RenderSlide from "@/src/features/auth/components/onboarding/RenderSlide";
+import { slides } from "@/src/features/auth/constants/slides";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
 import { Animated, Dimensions, FlatList, View } from "react-native";
