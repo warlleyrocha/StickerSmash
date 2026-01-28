@@ -1,0 +1,32 @@
+// hooks/useRepublicActions.ts
+import { republicService } from "../services/republic.service";
+import { useRouter } from "expo-router";
+import type { RepublicPost } from "../types/republic.types";
+import { showToast } from "@/src/utils/showToast";
+
+export function useRepublicActions() {
+  const router = useRouter();
+
+  async function createRepublic(data: RepublicPost) {
+    const republic = await republicService.createRepublic(data);
+    showToast.success("República criada com sucesso");
+    router.push(`/(republics)/${republic.id}`);
+    return republic;
+  }
+
+  async function updateRepublic(id: string, data: RepublicPost) {
+    await republicService.updateRepublic(id, data);
+    showToast.success("República atualizada");
+  }
+
+  async function deleteRepublic(id: string) {
+    await republicService.deleteRepublic(id);
+    showToast.success("República removida");
+  }
+
+  return {
+    createRepublic,
+    updateRepublic,
+    deleteRepublic,
+  };
+}
