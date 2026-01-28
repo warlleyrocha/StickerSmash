@@ -20,7 +20,7 @@ export function useSideMenu(
         params: { id: republicId },
       });
     },
-    settings: () => router.push("/(userProfile)/settings"),
+    controlPanel: () => router.push("/(userProfile)/control-panel"),
   };
 
   const menuItems = useMemo<MenuItem[]>(() => {
@@ -49,11 +49,11 @@ export function useSideMenu(
         icon: "mail-outline" as const,
         onPress: navigation.invitesSent,
       },
-      settings: {
-        id: "settings",
+      controlPanel: {
+        id: "controlPanel",
         label: "Painel de Controle",
-        icon: "settings-outline" as const,
-        onPress: navigation.settings,
+        icon: "grid-outline" as const,
+        onPress: navigation.controlPanel,
       },
     };
 
@@ -62,7 +62,7 @@ export function useSideMenu(
         return [base.home, base.profile, base.invitesSent];
 
       case "profile":
-        return [base.home, base.invites, base.settings];
+        return [base.home, base.invites, base.controlPanel];
 
       case "invite":
         return [base.home, base.profile, base.invites];
@@ -77,7 +77,7 @@ export function useSideMenu(
     navigation.profile,
     navigation.invites,
     navigation.invitesSent,
-    navigation.settings,
+    navigation.controlPanel,
   ]);
 
   const footerItems = useMemo<MenuItem[]>(

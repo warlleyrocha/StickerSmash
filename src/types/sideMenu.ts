@@ -7,7 +7,7 @@ export interface MenuItem {
     | "home-outline"
     | "person-outline"
     | "mail-outline"
-    | "settings-outline"
+    | "grid-outline"
     | "log-out-outline";
   onPress: () => void;
   danger?: boolean;
