@@ -9,7 +9,7 @@ import { useInvites } from "@/src/hooks/useInvite";
 import { useRepublic } from "@/src/hooks/useRepublic";
 import { useRepublicResidents } from "@/src/hooks/useRepublicResidents";
 
-import type { RepublicResponse } from "@/src/types/republic.types";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 
 import { showToast } from "@/src/utils/showToast";
 

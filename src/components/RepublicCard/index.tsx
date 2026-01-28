@@ -1,4 +1,4 @@
-import type { RepublicResponse } from "@/src/types/republic.types";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { Ionicons } from "@expo/vector-icons";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 

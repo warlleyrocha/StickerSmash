@@ -1,5 +1,5 @@
 import { useResidents } from "@/src/hooks/useResidents";
-import type { RepublicResponse } from "@/src/types/republic.types";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { useCallback, useEffect, useState } from "react";
 
 export function useRepublicResidents(republics: RepublicResponse[]) {

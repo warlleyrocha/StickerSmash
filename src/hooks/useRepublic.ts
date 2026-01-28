@@ -1,8 +1,8 @@
-import { republicService } from "@/src/services/republic.service";
+import { republicService } from "@/src/features/republic/services/republic.service";
 import type {
   RepublicPost,
   RepublicResponse,
-} from "@/src/types/republic.types";
+} from "@/src/features/republic/types/republic.types";
 import { showToast } from "@/src/utils/showToast";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";

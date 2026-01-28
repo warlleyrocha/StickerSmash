@@ -1,5 +1,8 @@
 import { api } from "@/src/services/api";
-import { RepublicPost, RepublicResponse } from "@/src/types/republic.types";
+import {
+  RepublicPost,
+  RepublicResponse,
+} from "@/src/features/republic/types/republic.types";
 import { AxiosError } from "axios";
 
 export const republicService = {

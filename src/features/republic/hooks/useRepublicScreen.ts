@@ -5,7 +5,7 @@ import { useAuth } from "@/src/features/auth/contexts";
 import { useRepublic } from "@/src/hooks/useRepublic";
 import { useResidents } from "@/src/hooks/useResidents";
 
-import type { RepublicResponse } from "@/src/types/republic.types";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import type { TabKey } from "@/src/types/tabs";
 
 import { showToast } from "@/src/utils/showToast";

@@ -2,7 +2,7 @@ import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 
-import type { RepublicResponse } from "@/src/types/republic.types";
+import type { RepublicResponse } from "@/src/features/republic/types/republic.types";
 import { MenuButton } from "@/src/components/SideMenu";
 
 interface RepublicHeaderProps {
