@@ -6,7 +6,7 @@ import RepublicCard from "@/src/components/RepublicCard";
 import { MenuButton, SideMenu } from "@/src/components/SideMenu";
 import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
 
-import { useAuth } from "@/src/contexts";
+import { useAuth } from "@/src/features/auth/contexts";
 
 import { useRepublic } from "@/src/hooks/useRepublic";
 

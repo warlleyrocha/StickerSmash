@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "expo-router";
 
-import { useAuth } from "@/src/contexts";
+import { useAuth } from "@/src/features/auth/contexts";
 import { useRepublic } from "@/src/hooks/useRepublic";
 import { useResidents } from "@/src/hooks/useResidents";
 

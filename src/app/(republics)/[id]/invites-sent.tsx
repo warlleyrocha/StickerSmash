@@ -1,6 +1,6 @@
 import { MenuButton, SideMenu } from "@/src/components/SideMenu";
 import { useSideMenu } from "@/src/components/SideMenu/useSideMenu";
-import { useAuth } from "@/src/contexts";
+import { useAuth } from "@/src/features/auth/contexts";
 import { useInvites } from "@/src/hooks/useInvite";
 import type { Invite } from "@/src/types/invite.types";
 import { formatDate } from "@/src/utils/formats";

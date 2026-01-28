@@ -1,10 +1,10 @@
-import { authService } from "@/src/services/auth.service";
+import { authService } from "@/src/features/auth/services/auth.service";
 import { userService } from "@/src/services/user.service";
 import {
   AuthResponse,
   CompleteProfileRequest,
   User,
-} from "@/src/types/auth.types";
+} from "@/src/features/auth/types/auth.types";
 import { UpdateUserRequest } from "@/src/types/user.types";
 import { showToast } from "@/src/utils/showToast";
 import AsyncStorage from "@react-native-async-storage/async-storage";

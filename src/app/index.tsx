@@ -1,5 +1,5 @@
 import LoadingScreen from "@/src/components/ui/loading-screen";
-import { useAuth } from "@/src/contexts";
+import { useAuth } from "@/src/features/auth/contexts";
 import { Redirect } from "expo-router";
 
 export default function Index() {

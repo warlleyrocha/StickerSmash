@@ -2,9 +2,9 @@ import { AxiosError } from "axios";
 import {
   AuthResponse,
   CompleteProfileRequest,
-  GoogleLoginRequest
+  GoogleLoginRequest,
 } from "../types/auth.types";
-import { api } from "./api";
+import { api } from "../../../services/api";
 
 export const authService = {
   // Método para login com Google
@@ -47,7 +47,7 @@ export const authService = {
         switch (error.response?.status) {
           case 400:
             throw new Error(
-              "Dados inválidos. Verifique os campos e tente novamente.",
+              "Dados inválidos. Verifique os campos e tente novamente."
             );
           case 401:
             throw new Error("Sessão expirada. Faça login novamente.");

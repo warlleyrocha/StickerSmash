@@ -1,6 +1,6 @@
 import LoadingScreen from "@/src/components/ui/loading-screen";
 import { Toaster } from "@/src/components/ui/sonner";
-import { AuthProvider, useAuth } from "@/src/contexts";
+import { AuthProvider, useAuth } from "@/src/features/auth/contexts";
 import {
   Inter_300Light,
   Inter_400Regular,

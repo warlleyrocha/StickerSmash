@@ -3,7 +3,7 @@ import { EditRepublicModal } from "@/src/components/Modals/EditRepublicModal";
 import { InviteModal } from "@/src/components/Modals/InviteModal";
 import LoadingScreen from "@/src/components/ui/loading-screen";
 
-import { useAuth } from "@/src/contexts/AuthContext";
+import { useAuth } from "@/src/features/auth/contexts/AuthContext";
 
 import { useInvites } from "@/src/hooks/useInvite";
 import { useRepublic } from "@/src/hooks/useRepublic";

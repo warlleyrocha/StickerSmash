@@ -77,7 +77,7 @@ export function useRepublic(): UseRepublicReturn {
       console.log("República cadastrada com sucesso", republicCreated.nome);
 
       // Navega para a página da república criada
-      router.push(`/(userProfile)/(republics)/${republicCreated.id}`);
+      router.push(`/(republics)/${republicCreated.id}`);
     } catch (error) {
       console.error("Erro ao salvar republica:", error);
       Alert.alert(
