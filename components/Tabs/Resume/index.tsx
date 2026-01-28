@@ -1,24 +1,19 @@
-import type { Republica } from "@/types/resume";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { ScrollView, Text, View } from "react-native";
-import { useResume } from "./useResume";
+import {
+  totalContas,
+  contasPagas,
+  contasPendentes,
+  quantidadeContasPagas,
+  quantidadeContasPendentes,
+  quantidadeTotalContas,
+  republicaMock,
+  dividas,
+} from "@/constants/resume.logic";
 
-interface ResumeTabProps {
-  republica: Republica;
-}
+export const ResumeTab = () => {
 
-export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
-  // Hook que contém toda a lógica de cálculo do resumo
-  const {
-    totalContas,
-    contasPagas,
-    contasPendentes,
-    quantidadeContasPagas,
-    quantidadeContasPendentes,
-    quantidadeTotalContas,
-    dividas,
-  } = useResume(republica);
 
   const resumoCards = [
     {
@@ -26,7 +21,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
       label: "Total de Contas",
       value: totalContas,
       icon: <Ionicons name="cash-outline" size={20} color="#2563eb" />,
-      description: `${republica.contas.length} contas registradas`,
+      description: `${quantidadeTotalContas} contas registradas`,
       color: "#2563eb",
     },
     {
@@ -85,7 +80,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({ republica }) => {
         </View>
 
         <View className="gap-3 space-y-3">
-          {republica.moradores.map((morador) => {
+          {republicaMock.moradores.map((morador) => {
             const valor = dividas[morador.id] ?? 0;
             const isPendente = valor > 0;
 

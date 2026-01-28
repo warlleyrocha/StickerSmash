@@ -1,58 +1,67 @@
 import { DeleteButton } from "@/components/ui/delete-button";
-import type { Conta, Republica } from "@/types/resume";
 import { formatMounthYear } from "@/utils/formats";
 import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { AddAccountModal } from "../../Modals/AddAccountModal";
-import { useAccounts } from "./useAccounts";
+import { useState } from "react";
+import { mesesDisponiveis, contasMockadas, moradoresMock, responsavel } from "@/constants/account.mock";
+//import { AddAccountModal } from "../../Modals/AddAccountModal";
+
+interface Responsavel {
+  moradorId: string;
+  valor: number;
+  pago?: boolean;
+};
+
+interface Conta {
+  id: string,
+  descricao: string,
+  valor: number,
+  vencimento: string,
+  status: string,
+  mesReferencia: string,
+  responsaveis: Responsavel[],
+  pago: boolean;
+  pagoEm?: string; // ISO date,
+  metodoPagamento?: string;
+}
 
 interface AccountsTabProps {
-  readonly republica: Republica;
-  readonly setRepublica: (rep: Republica) => void;
   readonly onOpenAdd?: () => void;
 }
 
 export function AccountsTab({
-  republica,
-  setRepublica,
   onOpenAdd,
 }: AccountsTabProps) {
-  const {
-    copiadoId,
-    expandidaId,
-    setExpandidaId,
-    mesSelecionado,
-    setMesSelecionado,
-    contaParaEditar,
-    showEditModal,
-    mesesDisponiveis,
-    contasOrdenadas,
-    mostrarContasPagas,
-    setMostrarContasPagas,
-    mostrarContasAbertas,
-    setMostrarContasAbertas,
-    marcarComoPago,
-    marcarResponsavelComoPago,
-    copiarChavePix,
-    abrirEdicao,
-    fecharEdicao,
-    deletarConta,
-  } = useAccounts({ republica, setRepublica });
+  const [mesSelecionado, setMesSelecionado] = useState<string>("todos");
+  const [mostrarContasAbertas, setMostrarContasAbertas] = useState(true);
+  const [mostrarContasPagas, setMostrarContasPagas] = useState(false);
+  const [expandidaId, setExpandidaId] = useState<string | null>(null);
+
+  // Filtra contas por mês
+  const contasFiltradas = mesSelecionado === "todos"
+    ? contasMockadas
+    : contasMockadas.filter(conta => conta.mesReferencia === mesSelecionado);
+
+  // Organiza contas em abertas e pagas
+  const contasOrdenadas = {
+    abertas: contasFiltradas.filter(conta => conta.status === "aberta"),
+    pagas: contasFiltradas.filter(conta => conta.status === "paga")
+  };
 
   const renderContaCard = (conta: Conta) => {
     const vencimento = new Date(conta.vencimento);
-    vencimento.setHours(23, 59, 59, 999); // Fim do dia do vencimento
+    vencimento.setHours(23, 59, 59, 999);
     const hoje = new Date();
     const vencida = vencimento < hoje && !conta.pago;
     const emAberto = vencimento >= hoje && !conta.pago;
-    const responsavel = republica.moradores.find(
-      (m) => m.id === conta.responsavelId
-    );
+    
+    // Mock: usando dados fictícios para responsável
+    const ownerAccount = responsavel
 
     return (
       <TouchableOpacity
         key={conta.id}
-        onPress={() => abrirEdicao(conta)}
+        onPress={() => console.log("Editar conta", conta.id)}
         activeOpacity={0.7}
       >
         <View
@@ -68,7 +77,7 @@ export function AccountsTab({
                 className="mb-2 flex-row items-center gap-2"
                 onPress={(e) => {
                   e.stopPropagation();
-                  marcarComoPago(conta.id);
+                  console.log("Marcar como pago", conta.id);
                 }}
               >
                 <MaterialCommunityIcons
@@ -99,10 +108,10 @@ export function AccountsTab({
                 </View>
 
                 {/* Responsável */}
-                {responsavel && (
+                {ownerAccount && (
                   <View className="rounded-md border border-indigo-600 px-2 py-1">
                     <Text className="text-xs text-indigo-600">
-                      Responsável: {responsavel.nome}
+                      Responsável: {ownerAccount.nome}
                     </Text>
                   </View>
                 )}
@@ -132,7 +141,7 @@ export function AccountsTab({
 
             {/* Valor e Ações à direita */}
             <View className="ml-2 items-end gap-2">
-              <DeleteButton onPress={() => deletarConta(conta)} size={18} />
+              <DeleteButton onPress={() => console.log("Deletar", conta.id)} size={18} />
               <Text className="font-semibold text-indigo-600">
                 R$ {conta.valor.toFixed(2)}
               </Text>
@@ -158,13 +167,11 @@ export function AccountsTab({
                 <Text className="font-semibold text-gray-700">Divisão:</Text>
                 <View className="flex-row items-center gap-2">
                   <Text className="text-sm text-gray-500">
-                    {conta.responsaveis.length}{" "}
-                    {conta.responsaveis.length === 1 ? "pessoa" : "pessoas"}
+                    {conta.responsaveis?.length || 0}{" "}
+                    {conta.responsaveis?.length === 1 ? "pessoa" : "pessoas"}
                   </Text>
                   <MaterialCommunityIcons
-                    name={
-                      expandidaId === conta.id ? "chevron-up" : "chevron-down"
-                    }
+                    name={expandidaId === conta.id ? "chevron-up" : "chevron-down"}
                     size={24}
                     color="#6b7280"
                   />
@@ -176,7 +183,7 @@ export function AccountsTab({
                 <View className="border-t border-gray-200 px-4 py-3">
                   <View className="space-y-2">
                     {conta.responsaveis.map((resp) => {
-                      const morador = republica.moradores.find(
+                      const morador = moradoresMock.find(
                         (m) => m.id === resp.moradorId
                       );
 
@@ -188,10 +195,7 @@ export function AccountsTab({
                           <TouchableOpacity
                             onPress={(e) => {
                               e.stopPropagation();
-                              marcarResponsavelComoPago(
-                                conta.id,
-                                resp.moradorId
-                              );
+                              console.log("Marcar responsável como pago", resp.moradorId);
                             }}
                             className="flex-1 flex-row items-center gap-2"
                           >
@@ -245,22 +249,13 @@ export function AccountsTab({
             </View>
 
             {/* Copiar PIX */}
-            {!conta.pago && responsavel?.chavePix && (
+            {!conta.pago && ownerAccount?.chavePix && (
               <TouchableOpacity
-                onPress={() => copiarChavePix(conta)}
+                onPress={() => console.log("Copiar PIX")}
                 className="flex-row items-center justify-center rounded-md border border-indigo-600 px-4 py-2"
               >
-                {copiadoId === conta.id ? (
-                  <>
-                    <Ionicons name="checkmark" size={18} color="#16a34a" />
-                    <Text className="ml-2 text-green-600">Copiado!</Text>
-                  </>
-                ) : (
-                  <>
-                    <Feather name="copy" size={18} color="#4b5563" />
-                    <Text className="ml-2 text-gray-700">Copiar Chave PIX</Text>
-                  </>
-                )}
+                <Feather name="copy" size={18} color="#4b5563" />
+                <Text className="ml-2 text-gray-700">Copiar Chave PIX</Text>
               </TouchableOpacity>
             )}
 
@@ -410,14 +405,14 @@ export function AccountsTab({
         </View>
       )}
 
-      {/* Modal de Edição */}
+      {/* Modal de Edição 
       <AddAccountModal
         visible={showEditModal}
         onClose={fecharEdicao}
         republica={republica}
         setRepublica={setRepublica}
         contaParaEditar={contaParaEditar}
-      />
+      />*/}
     </ScrollView>
   );
 }

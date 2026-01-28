@@ -228,10 +228,12 @@ export default function Home() {
         {renderTabContent()}
       </View>
 
-      <AddAccountModal
-        visible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-      />
+      {/*
+        <AddAccountModal
+          visible={showAddModal}
+          onClose={() => setShowAddModal(false)}
+        />
+      */}
 
       <EditRepublicModal
         visible={showEditModal}
